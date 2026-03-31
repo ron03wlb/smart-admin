@@ -1,16 +1,18 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import dictReducer, {
   initDictData,
   clearDictData,
-  getDictLabel,
+  selectDictLabel,
 } from '@/store/slices/dictSlice';
-import type { DictDataItem, DictState } from '@/store/slices/dictSlice';
+import type { DictState } from '@/store/slices/dictSlice';
+import type { DictDataItem } from '@/types/dict';
+import type { RootState } from '@/store';
 
 const SAMPLE_DICT_DATA: DictDataItem[] = [
-  { dictCode: 'GENDER', dictName: '性別', dictDisabledFlag: false, dataValue: '1', dataLabel: '男', disabledFlag: false },
-  { dictCode: 'GENDER', dictName: '性別', dictDisabledFlag: false, dataValue: '2', dataLabel: '女', disabledFlag: false },
-  { dictCode: 'STATUS', dictName: '狀態', dictDisabledFlag: false, dataValue: '1', dataLabel: '啟用', disabledFlag: false },
-  { dictCode: 'STATUS', dictName: '狀態', dictDisabledFlag: false, dataValue: '0', dataLabel: '停用', disabledFlag: false },
+  { dictCode: 'GENDER', dictName: '性別', dictDisabledFlag: false, dataValue: '1', dataLabel: '男', dataSort: 1 },
+  { dictCode: 'GENDER', dictName: '性別', dictDisabledFlag: false, dataValue: '2', dataLabel: '女', dataSort: 2 },
+  { dictCode: 'STATUS', dictName: '狀態', dictDisabledFlag: false, dataValue: '1', dataLabel: '啟用', dataSort: 1 },
+  { dictCode: 'STATUS', dictName: '狀態', dictDisabledFlag: false, dataValue: '0', dataLabel: '停用', dataSort: 2 },
 ];
 
 describe('dictSlice', () => {
@@ -42,7 +44,7 @@ describe('dictSlice', () => {
   it('should replace dict data on re-init', () => {
     const state1 = dictReducer(undefined, initDictData(SAMPLE_DICT_DATA));
     const newData: DictDataItem[] = [
-      { dictCode: 'COLOR', dictName: '顏色', dictDisabledFlag: false, dataValue: 'R', dataLabel: '紅', disabledFlag: false },
+      { dictCode: 'COLOR', dictName: '顏色', dictDisabledFlag: false, dataValue: 'R', dataLabel: '紅', dataSort: 1 },
     ];
     const state2 = dictReducer(state1, initDictData(newData));
 
@@ -52,34 +54,40 @@ describe('dictSlice', () => {
   });
 });
 
-describe('getDictLabel', () => {
-  const dictMap: DictState['dictMap'] = {};
+describe('selectDictLabel', () => {
+  let dictState: DictState;
 
   beforeAll(() => {
-    const state = dictReducer(undefined, initDictData(SAMPLE_DICT_DATA));
-    Object.assign(dictMap, state.dictMap);
+    dictState = dictReducer(undefined, initDictData(SAMPLE_DICT_DATA));
   });
 
+  /**
+   * Helper to create a minimal RootState with dict data for testing selectors.
+   */
+  function mockRootState(): RootState {
+    return { dict: dictState } as unknown as RootState;
+  }
+
   it('should get label for string value', () => {
-    expect(getDictLabel(dictMap, 'GENDER', '1')).toBe('男');
-    expect(getDictLabel(dictMap, 'GENDER', '2')).toBe('女');
+    expect(selectDictLabel(mockRootState(), 'GENDER', '1')).toBe('男');
+    expect(selectDictLabel(mockRootState(), 'GENDER', '2')).toBe('女');
   });
 
   it('should get label for number value', () => {
-    expect(getDictLabel(dictMap, 'STATUS', 1)).toBe('啟用');
-    expect(getDictLabel(dictMap, 'STATUS', 0)).toBe('停用');
+    expect(selectDictLabel(mockRootState(), 'STATUS', 1)).toBe('啟用');
+    expect(selectDictLabel(mockRootState(), 'STATUS', 0)).toBe('停用');
   });
 
   it('should return empty for null/undefined', () => {
-    expect(getDictLabel(dictMap, 'GENDER', null)).toBe('');
-    expect(getDictLabel(dictMap, 'GENDER', undefined)).toBe('');
+    expect(selectDictLabel(mockRootState(), 'GENDER', null)).toBe('');
+    expect(selectDictLabel(mockRootState(), 'GENDER', undefined)).toBe('');
   });
 
   it('should return empty for unknown code', () => {
-    expect(getDictLabel(dictMap, 'UNKNOWN', '1')).toBe('');
+    expect(selectDictLabel(mockRootState(), 'UNKNOWN', '1')).toBe('');
   });
 
   it('should handle comma-separated multi-values', () => {
-    expect(getDictLabel(dictMap, 'GENDER', '1,2')).toBe('男,女');
+    expect(selectDictLabel(mockRootState(), 'GENDER', '1,2')).toBe('男,女');
   });
 });

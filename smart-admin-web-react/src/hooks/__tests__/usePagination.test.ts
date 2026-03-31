@@ -12,7 +12,7 @@ describe('usePagination', () => {
   });
 
   it('should accept custom default page size', () => {
-    const { result } = renderHook(() => usePagination(20));
+    const { result } = renderHook(() => usePagination({ defaultPageSize: 20 }));
 
     expect(result.current.pageSize).toBe(20);
     expect(result.current.pagination.pageSize).toBe(20);
@@ -50,11 +50,11 @@ describe('usePagination', () => {
     expect(result.current.pagination.total).toBe(100);
   });
 
-  it('should handle onTableChange', () => {
+  it('should handle page change via handlePageChange', () => {
     const { result } = renderHook(() => usePagination());
 
     act(() => {
-      result.current.onTableChange({ current: 5, pageSize: 25 });
+      result.current.handlePageChange(5, 25);
     });
 
     expect(result.current.pageNum).toBe(5);
@@ -62,7 +62,7 @@ describe('usePagination', () => {
   });
 
   it('should reset to defaults', () => {
-    const { result } = renderHook(() => usePagination(15));
+    const { result } = renderHook(() => usePagination({ defaultPageSize: 15 }));
 
     act(() => {
       result.current.setPageNum(5);

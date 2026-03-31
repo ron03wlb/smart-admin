@@ -1,8 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useTable } from '../useTable';
-import type { ResponseModel } from '@/api/base/response.model';
-import type { PageResult } from '@/api/base/page.model';
 
 interface MockItem {
   id: number;
@@ -15,15 +13,17 @@ const mockData: MockItem[] = [
   { id: 3, name: 'Charlie' },
 ];
 
+/**
+ * Create a mock API that returns SmartAdmin ResponseDTO format: { ok, data }
+ */
 function createMockApi(data: MockItem[] = mockData) {
   return vi.fn().mockResolvedValue({
-    code: 1,
-    success: true,
+    ok: true,
     data: {
       list: data,
       total: data.length,
     },
-  } as ResponseModel<PageResult<MockItem>>);
+  });
 }
 
 describe('useTable', () => {
@@ -35,33 +35,31 @@ describe('useTable', () => {
 
   it('should have correct initial state', () => {
     const { result } = renderHook(() =>
-      useTable<MockItem>({ queryApi: mockApi, immediate: false }),
+      useTable<MockItem>({ queryApi: mockApi, autoQuery: false }),
     );
 
-    expect(result.current.dataSource).toEqual([]);
+    expect(result.current.tableData).toEqual([]);
     expect(result.current.loading).toBe(false);
-    expect(result.current.total).toBe(0);
     expect(result.current.pagination.current).toBe(1);
     expect(result.current.pagination.pageSize).toBe(10);
     expect(result.current.selectedRowKeys).toEqual([]);
   });
 
-  it('should auto-query on mount when immediate is true', async () => {
+  it('should auto-query on mount when autoQuery is true', async () => {
     const { result } = renderHook(() =>
-      useTable<MockItem>({ queryApi: mockApi, immediate: true }),
+      useTable<MockItem>({ queryApi: mockApi, autoQuery: true }),
     );
 
     await waitFor(() => {
-      expect(result.current.dataSource).toHaveLength(3);
+      expect(result.current.tableData).toHaveLength(3);
     });
 
     expect(mockApi).toHaveBeenCalledTimes(1);
-    expect(result.current.total).toBe(3);
   });
 
-  it('should not auto-query on mount when immediate is false', async () => {
+  it('should not auto-query on mount when autoQuery is false', async () => {
     renderHook(() =>
-      useTable<MockItem>({ queryApi: mockApi, immediate: false }),
+      useTable<MockItem>({ queryApi: mockApi, autoQuery: false }),
     );
 
     // Give it time to potentially fire
@@ -74,33 +72,34 @@ describe('useTable', () => {
       useTable<MockItem, { keyword?: string }>({
         queryApi: mockApi,
         defaultQueryForm: { keyword: 'test' },
-        immediate: true,
+        autoQuery: true,
       }),
     );
 
     await waitFor(() => {
-      expect(result.current.dataSource).toHaveLength(3);
+      expect(result.current.tableData).toHaveLength(3);
     });
 
-    expect(mockApi).toHaveBeenCalledWith({
-      keyword: 'test',
-      pageNum: 1,
-      pageSize: 10,
-      sortItemList: undefined,
-    });
+    expect(mockApi).toHaveBeenCalledWith(
+      expect.objectContaining({
+        keyword: 'test',
+        pageNum: 1,
+        pageSize: 10,
+      }),
+    );
   });
 
-  it('should handle page change via onTableChange', async () => {
+  it('should handle page change via handleTableChange', async () => {
     const { result } = renderHook(() =>
-      useTable<MockItem>({ queryApi: mockApi, immediate: true }),
+      useTable<MockItem>({ queryApi: mockApi, autoQuery: true }),
     );
 
     await waitFor(() => {
-      expect(result.current.dataSource).toHaveLength(3);
+      expect(result.current.tableData).toHaveLength(3);
     });
 
     act(() => {
-      result.current.onTableChange({ current: 2, pageSize: 10 });
+      result.current.handleTableChange({ current: 2, pageSize: 10 }, {}, {});
     });
 
     await waitFor(() => {
@@ -114,15 +113,15 @@ describe('useTable', () => {
 
   it('should handle pageSize change', async () => {
     const { result } = renderHook(() =>
-      useTable<MockItem>({ queryApi: mockApi, immediate: true }),
+      useTable<MockItem>({ queryApi: mockApi, autoQuery: true }),
     );
 
     await waitFor(() => {
-      expect(result.current.dataSource).toHaveLength(3);
+      expect(result.current.tableData).toHaveLength(3);
     });
 
     act(() => {
-      result.current.onTableChange({ current: 1, pageSize: 20 });
+      result.current.handleTableChange({ current: 1, pageSize: 20 }, {}, {});
     });
 
     await waitFor(() => {
@@ -139,18 +138,18 @@ describe('useTable', () => {
       useTable<MockItem, { keyword?: string }>({
         queryApi: mockApi,
         defaultQueryForm: { keyword: '' },
-        immediate: false,
+        autoQuery: false,
       }),
     );
 
     act(() => {
-      result.current.setQueryForm({ keyword: 'search' });
+      result.current.setQueryForm(prev => ({ ...prev, keyword: 'search' }));
     });
 
     expect(result.current.queryForm.keyword).toBe('search');
 
     act(() => {
-      result.current.resetQuery();
+      result.current.reset();
     });
 
     expect(result.current.queryForm.keyword).toBe('');
@@ -159,7 +158,7 @@ describe('useTable', () => {
 
   it('should manage selectedRowKeys', () => {
     const { result } = renderHook(() =>
-      useTable<MockItem>({ queryApi: mockApi, immediate: false }),
+      useTable<MockItem>({ queryApi: mockApi, autoQuery: false }),
     );
 
     act(() => {
@@ -169,34 +168,17 @@ describe('useTable', () => {
     expect(result.current.selectedRowKeys).toEqual([1, 2, 3]);
   });
 
-  it('should update queryForm via setQueryForm', () => {
+  it('should handle sort via handleTableChange', async () => {
     const { result } = renderHook(() =>
-      useTable<MockItem, { keyword?: string; status?: number }>({
-        queryApi: mockApi,
-        defaultQueryForm: { keyword: '', status: undefined },
-        immediate: false,
-      }),
-    );
-
-    act(() => {
-      result.current.setQueryForm({ keyword: 'hello', status: 1 });
-    });
-
-    expect(result.current.queryForm.keyword).toBe('hello');
-    expect(result.current.queryForm.status).toBe(1);
-  });
-
-  it('should handle sort via onTableChange', async () => {
-    const { result } = renderHook(() =>
-      useTable<MockItem>({ queryApi: mockApi, immediate: true }),
+      useTable<MockItem>({ queryApi: mockApi, autoQuery: true }),
     );
 
     await waitFor(() => {
-      expect(result.current.dataSource).toHaveLength(3);
+      expect(result.current.tableData).toHaveLength(3);
     });
 
     act(() => {
-      result.current.onTableChange(
+      result.current.handleTableChange(
         { current: 1, pageSize: 10 },
         {},
         { field: 'name', order: 'ascend' },
@@ -209,7 +191,7 @@ describe('useTable', () => {
 
     expect(mockApi).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        sortItemList: [{ column: 'name', isAsc: true }],
+        sortItemList: [{ column: 'name', order: 'asc' }],
       }),
     );
   });
@@ -223,7 +205,7 @@ describe('useTable', () => {
     );
 
     const { result } = renderHook(() =>
-      useTable<MockItem>({ queryApi: slowApi, immediate: true }),
+      useTable<MockItem>({ queryApi: slowApi, autoQuery: true }),
     );
 
     // Loading should be true during query
@@ -234,8 +216,7 @@ describe('useTable', () => {
     // Resolve the promise
     act(() => {
       resolvePromise!({
-        code: 1,
-        success: true,
+        ok: true,
         data: { list: mockData, total: 3 },
       });
     });

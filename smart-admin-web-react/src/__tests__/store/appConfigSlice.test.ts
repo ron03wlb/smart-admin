@@ -5,7 +5,8 @@ import appConfigReducer, {
   toggleDarkMode,
   setLayout,
   setLanguage,
-  toggleFullScreen,
+  startFullScreen,
+  exitFullScreen,
   showHelpDoc,
   hideHelpDoc,
   APP_CONFIG_DEFAULTS,
@@ -67,8 +68,11 @@ describe('appConfigSlice', () => {
   });
 
   it('should toggle full screen', () => {
-    const state = appConfigReducer(APP_CONFIG_DEFAULTS, toggleFullScreen());
+    const state = appConfigReducer(APP_CONFIG_DEFAULTS, startFullScreen());
     expect(state.fullScreenFlag).toBe(true);
+
+    const state2 = appConfigReducer(state, exitFullScreen());
+    expect(state2.fullScreenFlag).toBe(false);
   });
 
   it('should show/hide help doc', () => {

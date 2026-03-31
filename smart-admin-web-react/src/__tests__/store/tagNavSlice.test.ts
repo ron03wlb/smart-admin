@@ -4,201 +4,189 @@
 import { describe, it, expect } from 'vitest';
 import tagNavReducer, {
   addTag,
-  setActiveKey,
+  setActiveTag,
   removeTag,
   removeOtherTags,
   removeAllTags,
-  clearTagNav,
+  resetTagNav,
   type TagNavState,
 } from '@/store/slices/tagNavSlice';
 
-const initialState: TagNavState = {
-  tagList: [],
-  activeKey: '',
+// The real initial state has a fixed '/home' tag
+const defaultInitialState: TagNavState = {
+  tags: [{ path: '/home', title: '首頁', fixed: true }],
+  activeTagPath: '/home',
+  keepAliveEnabled: true,
+  cachedPaths: ['/home'],
 };
 
 describe('tagNavSlice', () => {
   describe('addTag', () => {
     it('should add a new tag', () => {
       const state = tagNavReducer(
-        initialState,
-        addTag({ tag: { path: '/system/employee', title: 'Employee' } })
+        defaultInitialState,
+        addTag({ path: '/system/employee', title: 'Employee' })
       );
 
-      expect(state.tagList).toHaveLength(1);
-      expect(state.tagList[0].path).toBe('/system/employee');
-      expect(state.tagList[0].title).toBe('Employee');
-      expect(state.activeKey).toBe('/system/employee');
+      expect(state.tags).toHaveLength(2);
+      expect(state.tags[1].path).toBe('/system/employee');
+      expect(state.tags[1].title).toBe('Employee');
+      expect(state.activeTagPath).toBe('/system/employee');
     });
 
     it('should not add duplicate tag', () => {
-      const stateWithTag: TagNavState = {
-        tagList: [{ path: '/system/employee', title: 'Employee' }],
-        activeKey: '/system/employee',
-      };
-
-      const state = tagNavReducer(
-        stateWithTag,
-        addTag({ tag: { path: '/system/employee', title: 'Employee Updated' } })
+      let state = tagNavReducer(
+        defaultInitialState,
+        addTag({ path: '/system/employee', title: 'Employee' })
       );
 
-      expect(state.tagList).toHaveLength(1);
-      expect(state.activeKey).toBe('/system/employee');
-    });
-
-    it('should update fromPath on existing tag', () => {
-      const stateWithTag: TagNavState = {
-        tagList: [{ path: '/system/employee', title: 'Employee' }],
-        activeKey: '/system/employee',
-      };
-
-      const state = tagNavReducer(
-        stateWithTag,
-        addTag({
-          tag: { path: '/system/employee', title: 'Employee' },
-          fromPath: '/system/role',
-        })
-      );
-
-      expect(state.tagList).toHaveLength(1);
-      expect(state.tagList[0].fromPath).toBe('/system/role');
-    });
-
-    it('should not add home path', () => {
-      const state = tagNavReducer(
-        initialState,
-        addTag({ tag: { path: '/home', title: 'Home' } })
-      );
-
-      expect(state.tagList).toHaveLength(0);
-    });
-
-    it('should enforce MAX_KEEP_ALIVE limit (30)', () => {
-      let state: TagNavState = { ...initialState };
-
-      // Add 30 tags
-      for (let i = 0; i < 30; i++) {
-        state = tagNavReducer(
-          state,
-          addTag({ tag: { path: `/page/${i}`, title: `Page ${i}` } })
-        );
-      }
-      expect(state.tagList).toHaveLength(30);
-      expect(state.tagList[0].path).toBe('/page/0');
-
-      // Add 31st tag — should remove the first one
       state = tagNavReducer(
         state,
-        addTag({ tag: { path: '/page/30', title: 'Page 30' } })
+        addTag({ path: '/system/employee', title: 'Employee Updated' })
       );
-      expect(state.tagList).toHaveLength(30);
-      expect(state.tagList[0].path).toBe('/page/1');
-      expect(state.tagList[29].path).toBe('/page/30');
+
+      // Still 2 tags (home + employee), not 3
+      expect(state.tags).toHaveLength(2);
+      expect(state.activeTagPath).toBe('/system/employee');
     });
 
-    it('should store icon and query', () => {
+    it('should update existing tag info when re-added', () => {
+      let state = tagNavReducer(
+        defaultInitialState,
+        addTag({ path: '/system/employee', title: 'Employee' })
+      );
+
+      state = tagNavReducer(
+        state,
+        addTag({ path: '/system/employee', title: 'Employee Updated', query: { id: '1' } })
+      );
+
+      expect(state.tags).toHaveLength(2);
+      expect(state.tags[1].title).toBe('Employee Updated');
+      expect(state.tags[1].query).toEqual({ id: '1' });
+    });
+
+    it('should store query params', () => {
       const state = tagNavReducer(
-        initialState,
+        defaultInitialState,
         addTag({
-          tag: {
-            path: '/system/employee',
-            title: 'Employee',
-            icon: 'UserOutlined',
-            query: { page: '1' },
-          },
+          path: '/system/employee',
+          title: 'Employee',
+          query: { page: '1' },
         })
       );
 
-      expect(state.tagList[0].icon).toBe('UserOutlined');
-      expect(state.tagList[0].query).toEqual({ page: '1' });
+      expect(state.tags[1].query).toEqual({ page: '1' });
+    });
+
+    it('should add to cachedPaths when keepAlive is enabled', () => {
+      const state = tagNavReducer(
+        defaultInitialState,
+        addTag({ path: '/system/employee', title: 'Employee' })
+      );
+
+      expect(state.cachedPaths).toContain('/system/employee');
     });
   });
 
-  describe('setActiveKey', () => {
-    it('should set active key', () => {
-      const state = tagNavReducer(initialState, setActiveKey('/system/role'));
+  describe('setActiveTag', () => {
+    it('should set active tag path for existing tag', () => {
+      let state = tagNavReducer(
+        defaultInitialState,
+        addTag({ path: '/system/employee', title: 'Employee' })
+      );
 
-      expect(state.activeKey).toBe('/system/role');
+      state = tagNavReducer(state, setActiveTag('/home'));
+      expect(state.activeTagPath).toBe('/home');
     });
   });
 
   describe('removeTag', () => {
-    it('should remove a tag by path', () => {
-      const stateWithTags: TagNavState = {
-        tagList: [
-          { path: '/system/employee', title: 'Employee' },
-          { path: '/system/role', title: 'Role' },
-        ],
-        activeKey: '/system/employee',
-      };
+    it('should remove a non-fixed tag by path', () => {
+      let state = tagNavReducer(
+        defaultInitialState,
+        addTag({ path: '/system/employee', title: 'Employee' })
+      );
 
-      const state = tagNavReducer(stateWithTags, removeTag('/system/employee'));
+      state = tagNavReducer(state, removeTag('/system/employee'));
+      expect(state.tags).toHaveLength(1);
+      expect(state.tags[0].path).toBe('/home');
+    });
 
-      expect(state.tagList).toHaveLength(1);
-      expect(state.tagList[0].path).toBe('/system/role');
+    it('should not remove fixed tags', () => {
+      const state = tagNavReducer(defaultInitialState, removeTag('/home'));
+
+      expect(state.tags).toHaveLength(1);
+      expect(state.tags[0].path).toBe('/home');
     });
 
     it('should do nothing for non-existent path', () => {
-      const stateWithTags: TagNavState = {
-        tagList: [{ path: '/system/employee', title: 'Employee' }],
-        activeKey: '/system/employee',
-      };
+      const state = tagNavReducer(defaultInitialState, removeTag('/non-existent'));
+      expect(state.tags).toHaveLength(1);
+    });
 
-      const state = tagNavReducer(stateWithTags, removeTag('/non-existent'));
+    it('should activate adjacent tag when removing active tag', () => {
+      let state = tagNavReducer(
+        defaultInitialState,
+        addTag({ path: '/system/employee', title: 'Employee' })
+      );
+      state = tagNavReducer(state, addTag({ path: '/system/role', title: 'Role' }));
 
-      expect(state.tagList).toHaveLength(1);
+      // Active is now /system/role, remove it
+      state = tagNavReducer(state, removeTag('/system/role'));
+      // Should activate the previous tag
+      expect(state.activeTagPath).toBe('/system/employee');
     });
   });
 
   describe('removeOtherTags', () => {
-    it('should keep only the specified tag', () => {
-      const stateWithTags: TagNavState = {
-        tagList: [
-          { path: '/a', title: 'A' },
-          { path: '/b', title: 'B' },
-          { path: '/c', title: 'C' },
-        ],
-        activeKey: '/b',
-      };
+    it('should keep only the specified tag and fixed tags', () => {
+      let state = tagNavReducer(
+        defaultInitialState,
+        addTag({ path: '/a', title: 'A' })
+      );
+      state = tagNavReducer(state, addTag({ path: '/b', title: 'B' }));
+      state = tagNavReducer(state, addTag({ path: '/c', title: 'C' }));
 
-      const state = tagNavReducer(stateWithTags, removeOtherTags('/b'));
+      state = tagNavReducer(state, removeOtherTags('/b'));
 
-      expect(state.tagList).toHaveLength(1);
-      expect(state.tagList[0].path).toBe('/b');
+      // Should keep /home (fixed) and /b
+      expect(state.tags).toHaveLength(2);
+      expect(state.tags.map(t => t.path)).toContain('/home');
+      expect(state.tags.map(t => t.path)).toContain('/b');
     });
   });
 
   describe('removeAllTags', () => {
-    it('should remove all tags and reset activeKey', () => {
-      const stateWithTags: TagNavState = {
-        tagList: [
-          { path: '/a', title: 'A' },
-          { path: '/b', title: 'B' },
-        ],
-        activeKey: '/a',
-      };
+    it('should remove all non-fixed tags', () => {
+      let state = tagNavReducer(
+        defaultInitialState,
+        addTag({ path: '/a', title: 'A' })
+      );
+      state = tagNavReducer(state, addTag({ path: '/b', title: 'B' }));
 
-      const state = tagNavReducer(stateWithTags, removeAllTags());
+      state = tagNavReducer(state, removeAllTags());
 
-      expect(state.tagList).toHaveLength(0);
-      expect(state.activeKey).toBe('');
+      // Only fixed /home remains
+      expect(state.tags).toHaveLength(1);
+      expect(state.tags[0].path).toBe('/home');
+      expect(state.activeTagPath).toBe('/home');
     });
   });
 
-  describe('clearTagNav', () => {
-    it('should clear all state (used on logout)', () => {
-      const stateWithTags: TagNavState = {
-        tagList: [
-          { path: '/a', title: 'A' },
-          { path: '/b', title: 'B' },
-        ],
-        activeKey: '/a',
-      };
+  describe('resetTagNav', () => {
+    it('should reset to initial state (used on logout)', () => {
+      let state = tagNavReducer(
+        defaultInitialState,
+        addTag({ path: '/a', title: 'A' })
+      );
+      state = tagNavReducer(state, addTag({ path: '/b', title: 'B' }));
 
-      const state = tagNavReducer(stateWithTags, clearTagNav());
+      state = tagNavReducer(state, resetTagNav());
 
-      expect(state.tagList).toHaveLength(0);
-      expect(state.activeKey).toBe('');
+      expect(state.tags).toHaveLength(1);
+      expect(state.tags[0].path).toBe('/home');
+      expect(state.activeTagPath).toBe('/home');
     });
   });
 });

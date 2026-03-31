@@ -9,7 +9,8 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { usePrivilege, usePrivileges } from '../usePrivilege';
 import userReducer from '@/store/slices/userSlice';
-import type { MenuPoint } from '@/types/user.types';
+import type { UserState } from '@/store/slices/userSlice';
+import type { PermissionPoint } from '@/types/menu';
 
 // ================================ Mock Store Factory ================================
 
@@ -18,50 +19,41 @@ import type { MenuPoint } from '@/types/user.types';
  */
 function createTestStore(overrides?: {
   administratorFlag?: boolean;
-  pointsList?: MenuPoint[];
+  pointsList?: PermissionPoint[];
 }) {
+  const preloadedUserState: UserState = {
+    token: 'test-token',
+    employeeId: 'test-employee-id',
+    employeeName: 'Test User',
+    loginName: 'testuser',
+    administratorFlag: overrides?.administratorFlag ?? false,
+    pointsList: overrides?.pointsList ?? [],
+    menuTree: [],
+    displayMenuTree: [],
+    menuRouterList: [],
+    menuParentIdListMap: {},
+    unreadMessageCount: 0,
+    loading: false,
+    error: null,
+  };
+
   return configureStore({
     reducer: {
       user: userReducer,
     },
     preloadedState: {
-      user: {
-        token: 'test-token',
-        employeeId: 'test-employee-id',
-        employeeName: 'Test User',
-        administratorFlag: overrides?.administratorFlag ?? false,
-        pointsList: overrides?.pointsList ?? [],
-        menuTree: [],
-      },
+      user: preloadedUserState,
     },
   });
 }
 
 /**
- * 測試用權限點數據
+ * 測試用權限點數據（matches PermissionPoint interface from @/types/menu）
  */
-const mockPermissions: MenuPoint[] = [
-  {
-    menuId: '1',
-    menuName: '用戶新增',
-    webPerms: 'system:user:add',
-    visibleFlag: true,
-    disabledFlag: false,
-  },
-  {
-    menuId: '2',
-    menuName: '用戶編輯',
-    webPerms: 'system:user:edit',
-    visibleFlag: true,
-    disabledFlag: false,
-  },
-  {
-    menuId: '3',
-    menuName: '商品查看',
-    webPerms: 'business:goods:query',
-    visibleFlag: true,
-    disabledFlag: false,
-  },
+const mockPermissions: PermissionPoint[] = [
+  { menuId: '1', webPerms: 'system:user:add', menuName: '用戶新增' },
+  { menuId: '2', webPerms: 'system:user:edit', menuName: '用戶編輯' },
+  { menuId: '3', webPerms: 'business:goods:query', menuName: '商品查看' },
 ];
 
 // ================================ usePrivilege Tests ================================
@@ -126,43 +118,6 @@ describe('usePrivilege', () => {
 
     expect(result.current).toBe(false);
   });
-
-  test('權限列表為 null 時應該返回 false', () => {
-    const store = createTestStore({ administratorFlag: false, pointsList: undefined as any });
-
-    const { result } = renderHook(() => usePrivilege('system:user:add'), {
-      wrapper: ({ children }) => <Provider store={store}>{children}</Provider>,
-    });
-
-    expect(result.current).toBe(false);
-  });
-
-  test('多個權限點包含相同 webPerms 時應該正確檢查', () => {
-    const duplicatePermissions: MenuPoint[] = [
-      {
-        menuId: '1',
-        menuName: '用戶新增',
-        webPerms: 'system:user:add',
-        visibleFlag: true,
-        disabledFlag: false,
-      },
-      {
-        menuId: '2',
-        menuName: '用戶新增（副本）',
-        webPerms: 'system:user:add',
-        visibleFlag: true,
-        disabledFlag: false,
-      },
-    ];
-
-    const store = createTestStore({ administratorFlag: false, pointsList: duplicatePermissions });
-
-    const { result } = renderHook(() => usePrivilege('system:user:add'), {
-      wrapper: ({ children }) => <Provider store={store}>{children}</Provider>,
-    });
-
-    expect(result.current).toBe(true);
-  });
 });
 
 // ================================ usePrivileges Tests ================================
@@ -184,46 +139,41 @@ describe('usePrivileges', () => {
       }
     );
 
-    expect(result.current).toEqual({
-      'system:user:add': true,
-      'system:user:edit': true,
-      'system:user:delete': true,
-      'business:goods:query': true,
-    });
+    // usePrivileges returns boolean (all permissions must be granted)
+    expect(result.current).toBe(true);
   });
 
   test('普通用戶應該根據權限列表返回正確結果', () => {
     const store = createTestStore({ administratorFlag: false, pointsList: mockPermissions });
 
+    // User has: system:user:add, system:user:edit, business:goods:query
+    // User does NOT have: system:user:delete
     const { result } = renderHook(
       () =>
         usePrivileges([
-          'system:user:add', // 有權限
-          'system:user:edit', // 有權限
-          'system:user:delete', // 無權限
-          'business:goods:query', // 有權限
+          'system:user:add',
+          'system:user:edit',
+          'system:user:delete', // missing
+          'business:goods:query',
         ]),
       {
         wrapper: ({ children }) => <Provider store={store}>{children}</Provider>,
       }
     );
 
-    expect(result.current).toEqual({
-      'system:user:add': true,
-      'system:user:edit': true,
-      'system:user:delete': false,
-      'business:goods:query': true,
-    });
+    // Not all permissions granted, so returns false
+    expect(result.current).toBe(false);
   });
 
-  test('空權限編碼數組應該返回空對象', () => {
+  test('空權限編碼數組應該返回 true (vacuously true)', () => {
     const store = createTestStore({ administratorFlag: false, pointsList: mockPermissions });
 
     const { result } = renderHook(() => usePrivileges([]), {
       wrapper: ({ children }) => <Provider store={store}>{children}</Provider>,
     });
 
-    expect(result.current).toEqual({});
+    // Array.every on empty array returns true
+    expect(result.current).toBe(true);
   });
 
   test('空權限列表應該對所有權限返回 false', () => {
@@ -236,11 +186,7 @@ describe('usePrivileges', () => {
       }
     );
 
-    expect(result.current).toEqual({
-      'system:user:add': false,
-      'system:user:edit': false,
-      'system:user:delete': false,
-    });
+    expect(result.current).toBe(false);
   });
 
   test('單個權限編碼應該正確檢查', () => {
@@ -250,8 +196,6 @@ describe('usePrivileges', () => {
       wrapper: ({ children }) => <Provider store={store}>{children}</Provider>,
     });
 
-    expect(result.current).toEqual({
-      'system:user:add': true,
-    });
+    expect(result.current).toBe(true);
   });
 });

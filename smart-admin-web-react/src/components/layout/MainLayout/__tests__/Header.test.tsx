@@ -57,6 +57,15 @@ vi.mock('@/api/support/message-api', () => ({
   },
 }));
 
+// Mock login API (used by logout thunk)
+vi.mock('@/api/system/loginApi', () => ({
+  loginApi: {
+    login: vi.fn().mockResolvedValue({ ok: true, data: {} }),
+    logout: vi.fn().mockResolvedValue({ ok: true, data: null, msg: '', code: 200 }),
+    getLoginInfo: vi.fn().mockResolvedValue({ ok: true, data: {} }),
+  },
+}));
+
 // Mock employee API (used by ChangePasswordModal in HeaderAvatar)
 vi.mock('@/api/system/employee-api', () => ({
   employeeApi: {

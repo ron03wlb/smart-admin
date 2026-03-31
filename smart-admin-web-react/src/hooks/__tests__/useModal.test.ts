@@ -12,7 +12,7 @@ describe('useModal', () => {
     const { result } = renderHook(() => useModal<MockData>());
 
     expect(result.current.visible).toBe(false);
-    expect(result.current.editData).toBeNull();
+    expect(result.current.formData).toEqual({});
     expect(result.current.isEdit).toBe(false);
   });
 
@@ -24,7 +24,6 @@ describe('useModal', () => {
     });
 
     expect(result.current.visible).toBe(true);
-    expect(result.current.editData).toBeNull();
     expect(result.current.isEdit).toBe(false);
   });
 
@@ -37,11 +36,11 @@ describe('useModal', () => {
     });
 
     expect(result.current.visible).toBe(true);
-    expect(result.current.editData).toEqual(data);
+    expect(result.current.formData).toEqual(expect.objectContaining(data));
     expect(result.current.isEdit).toBe(true);
   });
 
-  it('should close modal and clear data', () => {
+  it('should close modal and reset formData', () => {
     const { result } = renderHook(() => useModal<MockData>());
 
     act(() => {
@@ -55,7 +54,8 @@ describe('useModal', () => {
     });
 
     expect(result.current.visible).toBe(false);
-    expect(result.current.editData).toBeNull();
+    // formData is reset to defaultFormData (empty object)
+    expect(result.current.formData).toEqual({});
     expect(result.current.isEdit).toBe(false);
   });
 
@@ -78,6 +78,6 @@ describe('useModal', () => {
       result.current.open();
     });
     expect(result.current.isEdit).toBe(false);
-    expect(result.current.editData).toBeNull();
+    expect(result.current.formData).toEqual({});
   });
 });
