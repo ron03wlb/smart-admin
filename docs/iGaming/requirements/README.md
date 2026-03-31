@@ -26,6 +26,7 @@
 | [13_Customer_Service](13_Customer_Service/) | 客服平台、運營 | 2 |
 | [14_Integration_Standards](14_Integration_Standards/) | 第三方整合 | 1 |
 | [15_Responsible_Gambling](15_Responsible_Gambling/) | 自我排除、存款限額、會話保護 | 4 |
+| [16_Metrics_KPIs](16_Metrics_KPIs/) | 業務 KPI 定義、績效指標 | 2 |
 
 ---
 
@@ -164,6 +165,13 @@
 | [會話保護需求（Session Protection Requirements）](15_Responsible_Gambling/03_Session_Protection_Requirements.md) | 冷靜期、會話管理、現實檢查 |
 | [負擔能力需求（Affordability Requirements）](15_Responsible_Gambling/04_Affordability_Requirements.md) | 玩家保護 API、負擔能力評估 |
 
+### 16 指標與 KPI（Metrics & KPIs）（2 份文檔）
+
+| 文件 | 關鍵主題 |
+|----------|------------|
+| [KPI 定義（KPI Definitions）](16_Metrics_KPIs/01_KPI_Definitions.md) | 核心業務 KPI 定義、計算方式 |
+| [業務指標（Business Metrics）](16_Metrics_KPIs/02_Business_Metrics.md) | 運營指標、財務指標、玩家指標 |
+
 ---
 
 ## 按角色快速連結（Quick Links by Role）
@@ -195,5 +203,5 @@
 
 ---
 
-**狀態（Status）**: Phase 9 完成 - 15 個類別共 66 份文檔
+**狀態（Status）**: Phase 9 完成 - 16 個類別共 68 份文檔（含 16_Metrics_KPIs）
 **驗證（Validation）**: 需求文檔中無代碼區塊（已透過 `validate-requirements-purity.sh` 驗證）
