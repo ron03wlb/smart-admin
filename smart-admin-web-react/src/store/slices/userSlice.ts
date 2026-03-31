@@ -60,6 +60,21 @@ export interface UserState {
   /** 菜單父ID映射表（用於麵包屑導航） */
   menuParentIdListMap: Record<string | number, (string | number)[]>;
 
+  /** 部門名稱 */
+  departmentName: string;
+
+  /** 上次登錄IP */
+  lastLoginIp: string;
+
+  /** 上次登錄IP地區 */
+  lastLoginIpRegion: string;
+
+  /** 上次登錄User-Agent */
+  lastLoginUserAgent: string;
+
+  /** 上次登錄時間 */
+  lastLoginTime: string;
+
   /** 未讀消息數量 */
   unreadMessageCount: number;
 
@@ -83,6 +98,11 @@ const initialState: UserState = {
   pointsList: [],
   menuRouterList: [],
   menuParentIdListMap: {},
+  departmentName: '',
+  lastLoginIp: '',
+  lastLoginIpRegion: '',
+  lastLoginUserAgent: '',
+  lastLoginTime: '',
   unreadMessageCount: 0,
   loading: false,
   error: null,
@@ -221,6 +241,11 @@ export const userSlice = createSlice({
       state.pointsList = [];
       state.menuRouterList = [];
       state.menuParentIdListMap = {};
+      state.departmentName = '';
+      state.lastLoginIp = '';
+      state.lastLoginIpRegion = '';
+      state.lastLoginUserAgent = '';
+      state.lastLoginTime = '';
       state.unreadMessageCount = 0;
       state.error = null;
 
@@ -260,6 +285,11 @@ export const userSlice = createSlice({
         state.employeeName = action.payload.employeeName;
         state.loginName = action.payload.loginName;
         state.administratorFlag = action.payload.administratorFlag;
+        state.departmentName = action.payload.departmentName || '';
+        state.lastLoginIp = action.payload.lastLoginIp || '';
+        state.lastLoginIpRegion = action.payload.lastLoginIpRegion || '';
+        state.lastLoginUserAgent = action.payload.lastLoginUserAgent || '';
+        state.lastLoginTime = action.payload.lastLoginTime || '';
         state.unreadMessageCount = action.payload.unreadMessageCount || 0;
 
         // 使用處理後的菜單數據（已在 AsyncThunk 中處理）
@@ -304,6 +334,11 @@ export const userSlice = createSlice({
         state.pointsList = [];
         state.menuRouterList = [];
         state.menuParentIdListMap = {};
+        state.departmentName = '';
+        state.lastLoginIp = '';
+        state.lastLoginIpRegion = '';
+        state.lastLoginUserAgent = '';
+        state.lastLoginTime = '';
         state.unreadMessageCount = 0;
 
         // 清除 localStorage

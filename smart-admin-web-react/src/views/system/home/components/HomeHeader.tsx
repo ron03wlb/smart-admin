@@ -18,6 +18,11 @@ const { Text } = Typography;
 
 const HomeHeader: React.FC = () => {
   const employeeName = useAppSelector(state => state.user.employeeName);
+  const departmentName = useAppSelector(state => state.user.departmentName);
+  const lastLoginTime = useAppSelector(state => state.user.lastLoginTime);
+  const lastLoginUserAgent = useAppSelector(state => state.user.lastLoginUserAgent);
+  const lastLoginIp = useAppSelector(state => state.user.lastLoginIp);
+  const lastLoginIpRegion = useAppSelector(state => state.user.lastLoginIpRegion);
 
   /**
    * 歡迎語（根據時間）
@@ -43,12 +48,59 @@ const HomeHeader: React.FC = () => {
 
   /**
    * 上次登錄信息
-   * TODO: 待後端提供 lastLoginTime, lastLoginUserAgent, lastLoginIp 等數據後完善
+   * 參考 Vue 版本 home-header.vue lastLoginInfo computed
    */
   const lastLoginInfo = useMemo(() => {
-    // 目前 UserState 中沒有上次登錄相關數據，暫時顯示歡迎消息
-    return '歡迎使用 SmartAdmin 管理系統';
-  }, []);
+    let info = '';
+
+    if (lastLoginTime) {
+      info += '上次登錄:' + lastLoginTime;
+    }
+
+    if (lastLoginUserAgent) {
+      // Simple UA parsing (browser + OS extraction)
+      const uaLower = lastLoginUserAgent.toLowerCase();
+      let browser = '';
+      if (uaLower.includes('edg')) {
+        browser = 'Edge';
+      } else if (uaLower.includes('chrome')) {
+        browser = 'Chrome';
+      } else if (uaLower.includes('firefox')) {
+        browser = 'Firefox';
+      } else if (uaLower.includes('safari')) {
+        browser = 'Safari';
+      }
+
+      let os = '';
+      if (uaLower.includes('windows')) {
+        os = 'Windows';
+      } else if (uaLower.includes('mac os')) {
+        os = 'macOS';
+      } else if (uaLower.includes('linux')) {
+        os = 'Linux';
+      } else if (uaLower.includes('android')) {
+        os = 'Android';
+      } else if (uaLower.includes('iphone') || uaLower.includes('ipad')) {
+        os = 'iOS';
+      }
+
+      if (browser || os) {
+        info += '; 設備:';
+        if (browser) info += ' ' + browser;
+        if (os) info += ' ' + os;
+      }
+    }
+
+    if (lastLoginIpRegion) {
+      info += '; ' + lastLoginIpRegion;
+    }
+
+    if (lastLoginIp) {
+      info += '; ' + lastLoginIp;
+    }
+
+    return info || '歡迎使用 SmartAdmin 管理系統';
+  }, [lastLoginTime, lastLoginUserAgent, lastLoginIp, lastLoginIpRegion]);
 
   /**
    * 當前日期信息
@@ -85,7 +137,7 @@ const HomeHeader: React.FC = () => {
         <div className="page-header-heading">
           <div className="page-header-title">{welcomeSentence}</div>
           <div className="page-header-subtitle">
-            <Text type="secondary">登錄帳號： {employeeName || '未知'}</Text>
+            <Text type="secondary">所屬部門： {departmentName || '未知'}</Text>
           </div>
         </div>
 

@@ -72,7 +72,7 @@ describe('menuConst', () => {
     it('should have correct menu type colors', () => {
       expect(MENU_TYPE_COLORS[MenuTypeEnum.CATALOG]).toBe('red');
       expect(MENU_TYPE_COLORS[MenuTypeEnum.MENU]).toBe('blue');
-      expect(MENU_TYPE_COLORS[MenuTypeEnum.POINTS]).toBe('green');
+      expect(MENU_TYPE_COLORS[MenuTypeEnum.POINTS]).toBe('orange');
     });
 
     it('should have all menu type colors', () => {

@@ -60,12 +60,13 @@ export interface CaptchaResult {
 
 /**
  * 登錄信息
+ * 對應後端 LoginResultVO (extends RequestEmployee)
  */
 export interface LoginInfo {
   /** 員工ID */
   employeeId: string;
 
-  /** 員工姓名 */
+  /** 員工姓名（後端欄位 actualName） */
   employeeName: string;
 
   /** 登錄帳號 */
@@ -73,6 +74,21 @@ export interface LoginInfo {
 
   /** 是否管理員 */
   administratorFlag: boolean;
+
+  /** 部門名稱 */
+  departmentName?: string;
+
+  /** 上次登錄IP */
+  lastLoginIp?: string;
+
+  /** 上次登錄IP地區 */
+  lastLoginIpRegion?: string;
+
+  /** 上次登錄User-Agent */
+  lastLoginUserAgent?: string;
+
+  /** 上次登錄時間 */
+  lastLoginTime?: string;
 
   /** 菜單樹 */
   menuTreeList: MenuVO[];
