@@ -1,5 +1,7 @@
 # 玩家生命週期 - 技術實作（Player Lifecycle - Technical Implementation）
 
+> **XREF（交叉引用）**: 完整業務規則定義見 [玩家生命週期業務需求](../../requirements/01_Player_Experience/04_Player_Lifecycle.md)
+
 > **Canonical Source**: [docs/iGaming/source-archive/01_Player_Center/01-01_Player_Lifecycle.md](../../source-archive/01_Player_Center/01-01_Player_Lifecycle.md)
 > **目標讀者（Audience）**: 開發人員、DevOps 工程師
 > **業務需求（Business Requirements）**: [Player_Lifecycle.md](../../requirements/01_Player_Experience/04_Player_Lifecycle.md)
