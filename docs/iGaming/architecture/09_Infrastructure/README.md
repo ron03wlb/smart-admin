@@ -51,18 +51,9 @@
 
 | 文件 | 說明 |
 |------|------|
-| [OAuth Refresh Token](18_OAuth_Refresh_Token.md) | OAuth Refresh Token 實施方案 |
-| [多主體 Token 安全](17_Multi_Actor_Token_Security.md) | 多主體 Token 安全模型 |
-
-## Token 驗證服務
-
-| 文件 | 說明 |
-|------|------|
-| [Token 驗證服務](20_Token_Validation_Service.md) | Token 驗證服務總覽 |
-| [Token 驗證架構](19_Token_Validation_Architecture.md) | Token 驗證服務架構 |
-| [Token 緩存性能](21_Token_Cache_Performance.md) | Token 緩存性能優化 |
-| [Token 邊緣部署](22_Token_Edge_Deployment.md) | 邊緣部署模式 |
+| [Token 安全架構](17_Token_Security_Architecture.md) | Multi-Actor Token 安全模型、OAuth Refresh Token 流程、Token 驗證架構（SSOT） |
+| [Token 效能與運維](18_Token_Operations.md) | Token 驗證服務、三層快取效能優化、Edge 部署策略（SSOT） |
 
 ---
 
-**最後更新**: 2026-02-12
+**最後更新**: 2026-03-31

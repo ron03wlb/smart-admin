@@ -6,6 +6,8 @@
 > **最後同步**: 2026-02-08
 > **來源版本**: 4.0.0
 
+> 詳見：[有效投注額架構](../02_Finance_Service/08_Turnover_Architecture.md) | [有效投注額實作：LockAmount、Effective Stake 與流程圖](../02_Finance_Service/09_Turnover_Implementation.md)
+
 ---
 
 ## 1. 核心計算公式（Core Calculation Formula）
