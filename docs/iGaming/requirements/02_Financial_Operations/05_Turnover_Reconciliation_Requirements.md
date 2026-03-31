@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md](../../source-archive/02_Finance_Center/02-04_Turnover_and_Game_Reconciliation_Analysis.md)
 > **Audience**: 高階主管、合規官員、產品經理、財務團隊
-> **Related Architecture**: [Turnover_Calculation_Architecture.md](../../architecture/02_Finance_Service/08_Turnover_Calculation_Architecture.md)
+> **Related Architecture**: [有效投注額架構：三層驗證與計算邏輯](../../architecture/02_Finance_Service/08_Turnover_Architecture.md)
 > **Last Synced**: 2026-02-09
 >
 > **精煉說明**：技術細節（三層驗證架構、Mermaid 流程圖、短路優化）已移至架構層。本文件僅專注於業務規則。
