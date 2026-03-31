@@ -6,13 +6,15 @@
  * @Date: 2026-03-14
  */
 
-import { useState, forwardRef, useImperativeHandle } from 'react';
+import { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import { Drawer, Form, Input, InputNumber, Radio, Space, Button, message } from 'antd';
 import { helpDocApi } from '@/api/support/helpDocApi';
-import type { HelpDocFormData, FileInfo } from '../types';
+import type { HelpDocFormData } from '../types';
 import HelpDocCatalogTreeSelect from './HelpDocCatalogTreeSelect';
-
-const { TextArea } = Input;
+import RichTextEditor from '@/components/RichTextEditor/RichTextEditor';
+import MenuTreeSelect from '@/components/system/menu-tree-select/MenuTreeSelect';
+import type { MenuTreeSelectRef } from '@/components/system/menu-tree-select/MenuTreeSelect';
+import FileUpload from '@/components/support/file-upload/FileUpload';
 
 export interface HelpDocFormDrawerProps {
   onReloadList: () => void;
@@ -28,14 +30,11 @@ const HelpDocFormDrawer = forwardRef<HelpDocFormDrawerRef, HelpDocFormDrawerProp
     const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
     const [relateHomeFlag, setRelateHomeFlag] = useState(false);
-    const [contentHtml, setContentHtml] = useState('');
-    const [defaultFileList, setDefaultFileList] = useState<FileInfo[]>([]);
+    const menuTreeSelectRef = useRef<MenuTreeSelectRef>(null);
 
     useImperativeHandle(ref, () => ({
       showDrawer: async (helpDocId?: number) => {
         form.resetFields();
-        setDefaultFileList([]);
-        setContentHtml('');
         setRelateHomeFlag(false);
 
         if (helpDocId) {
@@ -51,12 +50,6 @@ const HelpDocFormDrawer = forwardRef<HelpDocFormDrawerRef, HelpDocFormDrawerProp
         setLoading(true);
         const result = await helpDocApi.getDetail(helpDocId);
         const data = result.data;
-
-        if (data.attachment && data.attachment.length > 0) {
-          setDefaultFileList(data.attachment);
-        }
-
-        setContentHtml(data.contentHtml);
 
         const relationIdList = data.relationList ? data.relationList.map(e => e.relationId) : [];
         if (relationIdList.length === 1 && relationIdList[0] === 0) {
@@ -88,13 +81,13 @@ const HelpDocFormDrawer = forwardRef<HelpDocFormDrawerRef, HelpDocFormDrawerProp
         await form.validateFields();
         const values = form.getFieldsValue();
 
-        // TODO: 從富文本編輯器獲取內容
-        // values.contentHtml = richTextEditor.getHtml();
-        // values.contentText = richTextEditor.getText();
-        values.contentHtml = contentHtml;
-        values.contentText = contentHtml; // Temporary: should extract text from HTML
+        // RichTextEditor content is synced via Form value/onChange
+        // Extract plain text from HTML for contentText field
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(values.contentHtml || '', 'text/html');
+        values.contentText = doc.body.textContent || '';
 
-        // 處理關聯關係
+        // Handle relation list (home page or menu association)
         if (relateHomeFlag) {
           values.relationList = [
             {
@@ -102,12 +95,11 @@ const HelpDocFormDrawer = forwardRef<HelpDocFormDrawerRef, HelpDocFormDrawerProp
               relationId: 0,
             },
           ];
+        } else if (menuTreeSelectRef.current) {
+          const relationIdList = form.getFieldValue('relationIdList') || [];
+          const menuList = menuTreeSelectRef.current.getMenuListByIdList(relationIdList);
+          values.relationList = menuList.map((e) => ({ relationId: Number(e.menuId), relationName: e.menuName }));
         }
-        // TODO: 如果不是首頁顯示，需要從 MenuTreeSelect 獲取選中的菜單列表
-        // else {
-        //   const relationList = menuTreeSelect.current.getMenuListByIdList(values.relationIdList);
-        //   values.relationList = relationList.map((e) => ({ relationId: e.menuId, relationName: e.menuName }));
-        // }
 
         setLoading(true);
         if (values.helpDocId) {
@@ -135,11 +127,6 @@ const HelpDocFormDrawer = forwardRef<HelpDocFormDrawerRef, HelpDocFormDrawerProp
       setVisible(false);
       form.resetFields();
     };
-
-    // const changeAttachment = (fileList: FileInfo[]) => {
-    //   setDefaultFileList(fileList);
-    //   form.setFieldsValue({ attachment: fileList });
-    // };
 
     return (
       <Drawer
@@ -197,8 +184,7 @@ const HelpDocFormDrawer = forwardRef<HelpDocFormDrawerRef, HelpDocFormDrawerProp
 
           {!relateHomeFlag && (
             <Form.Item label="關聯菜單" name="relationIdList">
-              {/* TODO: 集成 MenuTreeSelect 組件 */}
-              <Input placeholder="TODO: 需要集成 MenuTreeSelect 組件" disabled />
+              <MenuTreeSelect ref={menuTreeSelectRef} />
             </Form.Item>
           )}
 
@@ -207,21 +193,15 @@ const HelpDocFormDrawer = forwardRef<HelpDocFormDrawerRef, HelpDocFormDrawerProp
             name="contentHtml"
             rules={[{ required: true, message: '請輸入內容' }]}
           >
-            {/* TODO: 集成富文本編輯器（ReactQuill, Draft.js, 或其他） */}
-            <TextArea
-              value={contentHtml}
-              onChange={e => setContentHtml(e.target.value)}
-              rows={10}
-              placeholder="TODO: 需要集成富文本編輯器組件（建議使用 ReactQuill 或 Draft.js）"
-            />
+            <RichTextEditor placeholder="請輸入幫助文檔內容" />
           </Form.Item>
 
           <Form.Item label="附件" name="attachment">
-            {/* TODO: 集成文件上傳組件 */}
-            <div>
-              <p>TODO: 需要集成文件上傳組件</p>
-              <p>已上傳附件：{defaultFileList.length} 個</p>
-            </div>
+            <FileUpload
+              maxCount={10}
+              maxSize={10}
+              listType="text"
+            />
           </Form.Item>
         </Form>
       </Drawer>

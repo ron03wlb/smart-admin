@@ -73,6 +73,7 @@ export interface HelpDocFormData {
   sort: number;
   attachment: FileInfo[];
   relationList: HelpDocRelation[];
+  relationIdList?: (string | number)[];
   contentHtml: string;
   contentText: string;
 }

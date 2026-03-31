@@ -4,7 +4,7 @@
  * Corresponds to Vue's components/system/menu-tree-select/index.vue
  * Filters to show only CATALOG and MENU types, disabling CATALOG nodes.
  */
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef, forwardRef, useImperativeHandle } from 'react';
 import { TreeSelect } from 'antd';
 import { menuApi } from '@/api/system/menu-api';
 import { MENU_TYPE_ENUM } from '@/constants/system/menu-const';
@@ -15,6 +15,10 @@ interface MenuTreeSelectProps {
   onChange?: (value: string[]) => void;
   placeholder?: string;
   style?: React.CSSProperties;
+}
+
+export interface MenuTreeSelectRef {
+  getMenuListByIdList: (menuIdList: (string | number)[]) => MenuItem[];
 }
 
 /** Build tree from flat menu list */
@@ -38,13 +42,14 @@ function buildMenuTree(menuList: (MenuItem & { disabled?: boolean })[]): any[] {
   return roots;
 }
 
-const MenuTreeSelect: React.FC<MenuTreeSelectProps> = ({
+const MenuTreeSelect = forwardRef<MenuTreeSelectRef, MenuTreeSelectProps>(({
   value,
   onChange,
   placeholder = '请选择菜单',
   style,
-}) => {
+}, ref) => {
   const [treeData, setTreeData] = useState<any[]>([]);
+  const menuListRef = useRef<(MenuItem & { disabled?: boolean })[]>([]);
 
   const queryMenuTree = useCallback(async () => {
     const res = await menuApi.query();
@@ -55,9 +60,16 @@ const MenuTreeSelect: React.FC<MenuTreeSelectProps> = ({
           ...item,
           disabled: item.menuType === String(MENU_TYPE_ENUM.CATALOG.value),
         }));
+      menuListRef.current = filtered;
       setTreeData(buildMenuTree(filtered));
     }
   }, []);
+
+  useImperativeHandle(ref, () => ({
+    getMenuListByIdList: (menuIdList: (string | number)[]) => {
+      return menuListRef.current.filter((e) => menuIdList.includes(e.menuId));
+    },
+  }));
 
   useEffect(() => {
     queryMenuTree();
@@ -80,6 +92,7 @@ const MenuTreeSelect: React.FC<MenuTreeSelectProps> = ({
       treeNodeFilterProp="menuName"
     />
   );
-};
+});
 
+MenuTreeSelect.displayName = 'MenuTreeSelect';
 export default MenuTreeSelect;

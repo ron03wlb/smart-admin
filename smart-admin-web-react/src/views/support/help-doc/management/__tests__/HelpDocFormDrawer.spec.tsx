@@ -1,7 +1,7 @@
 /**
  * HelpDocFormDrawer Tests
  */
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import HelpDocFormDrawer from '../HelpDocFormDrawer';
 
@@ -22,8 +22,6 @@ vi.mock('@/api/support/help-doc-api', () => ({
     getAll: vi.fn().mockResolvedValue({ code: 1, data: [] }),
   },
 }));
-
-import { helpDocApi } from '@/api/support/help-doc-api';
 
 describe('HelpDocFormDrawer', () => {
   const onClose = vi.fn();
