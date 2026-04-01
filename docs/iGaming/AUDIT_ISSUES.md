@@ -10,7 +10,7 @@
 
 | 類型 | 總數 | 已解決 | 待處理 |
 |------|------|--------|--------|
-| Broken links | 28 | 0 | 28 |
+| Broken links | 28 | 28 | 0 |
 | 缺失文件（DOCS_SPEC 宣稱存在） | 17 | 0 | 17 |
 | XREF 前向連結缺失（requirements） | 4 | 0 | 4 |
 | XREF 後向連結缺失（architecture） | 16 | 0 | 16 |

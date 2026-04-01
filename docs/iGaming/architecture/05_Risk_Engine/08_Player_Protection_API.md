@@ -61,7 +61,7 @@ Risk Engine 發布以下事件，由 RG 模組消費並執行保護行動：
 | **Affordability 業務規則（SSOT）** | [Affordability Requirements](../../requirements/05_Risk_Compliance/09_Affordability_Requirements.md) |
 | **Affordability 架構實作** | [Affordability Implementation](09_Affordability_Implementation.md) |
 | **業務需求** | [Player_Protection_Requirements.md](../../requirements/05_Risk_Compliance/08_Player_Protection_Requirements.md) |
-| **玩家狀態管理** | [Player Lifecycle Implementation](../../01_Player_Service/01_Player_Lifecycle_Implementation.md) |
+| **玩家狀態管理** | [Player Lifecycle Implementation](../01_Player_Service/01_Player_Lifecycle_Implementation.md) |
 
 ---
 
