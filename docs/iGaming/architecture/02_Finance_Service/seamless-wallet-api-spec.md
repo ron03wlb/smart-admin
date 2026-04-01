@@ -5,7 +5,7 @@
 **狀態**: Draft（設計階段）
 **目標**: Phase 2 實施規格
 
-> **Business Requirements**: [Seamless_Wallet_Requirements.md](../requirements/02_Financial_Operations/01_Seamless_Wallet_Requirements.md)
+> **Business Requirements**: [Seamless_Wallet_Requirements.md](../../requirements/02_Financial_Operations/01_Seamless_Wallet_Requirements.md)
 > **Last Synced**: 2026-03-11
 
 ---
@@ -667,9 +667,9 @@ if (!valid) {
 
 ## 📚 相關文檔
 
-- [無縫錢包技術實作](02_Finance_Service/03_Seamless_Wallet_Technical.md) - 技術實作文檔
-- [支付閘道 API](02_Finance_Service/05_Payment_Gateway_API.md) - 支付閘道 API
-- [無縫錢包需求](../requirements/02_Financial_Operations/01_Seamless_Wallet_Requirements.md) - 業務需求文檔
+- [無縫錢包技術實作](03_Seamless_Wallet_Technical.md) - 技術實作文檔
+- [支付閘道 API](05_Payment_Gateway_API.md) - 支付閘道 API
+- [無縫錢包需求](../../requirements/02_Financial_Operations/01_Seamless_Wallet_Requirements.md) - 業務需求文檔
 
 ---
 

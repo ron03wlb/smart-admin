@@ -5,7 +5,7 @@
 > **文件類型**: 技術架構
 > **目標讀者**: 架構師、後端開發人員
 
-> **職責邊界（Responsibility Boundary）**：本文件（RG）負責**執行策略（如何執行保護）**。觸發機制（何時觸發保護）詳見：[Risk Engine Player Protection API](../../05_Risk_Engine/08_Player_Protection_API.md)
+> **職責邊界（Responsibility Boundary）**：本文件（RG）負責**執行策略（如何執行保護）**。觸發機制（何時觸發保護）詳見：[Risk Engine Player Protection API](../05_Risk_Engine/08_Player_Protection_API.md)
 
 ---
 

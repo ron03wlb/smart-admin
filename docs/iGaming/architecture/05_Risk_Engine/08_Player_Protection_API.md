@@ -5,13 +5,13 @@
 > **業務需求**: [Player_Protection_Requirements.md](../../requirements/05_Risk_Compliance/08_Player_Protection_Requirements.md)
 > **最後同步**: 2026-02-08
 
-> **職責邊界（Responsibility Boundary）**：本文件（Risk Engine）負責**觸發機制（何時觸發保護）**。執行策略（如何執行保護）詳見：[RG Player Protection API](../../15_Responsible_Gambling/04_Player_Protection_API.md)
+> **職責邊界（Responsibility Boundary）**：本文件（Risk Engine）負責**觸發機制（何時觸發保護）**。執行策略（如何執行保護）詳見：[RG Player Protection API](../15_Responsible_Gambling/04_Player_Protection_API.md)
 
 ---
 
 ## 1. 概述（Overview）
 
-本文件定義 Risk Engine 如何決定**何時觸發**玩家保護行動。具體保護執行策略（API 端點規格、資料庫結構、Controller 實作）請參閱 [RG Player Protection API](../../15_Responsible_Gambling/04_Player_Protection_API.md)。
+本文件定義 Risk Engine 如何決定**何時觸發**玩家保護行動。具體保護執行策略（API 端點規格、資料庫結構、Controller 實作）請參閱 [RG Player Protection API](../15_Responsible_Gambling/04_Player_Protection_API.md)。
 
 ---
 
@@ -57,7 +57,7 @@ Risk Engine 發布以下事件，由 RG 模組消費並執行保護行動：
 
 | 主題 | 文檔 |
 |-----|------|
-| **執行策略（API 端點、DB Schema、Controller）** | [RG Player Protection API](../../15_Responsible_Gambling/04_Player_Protection_API.md) |
+| **執行策略（API 端點、DB Schema、Controller）** | [RG Player Protection API](../15_Responsible_Gambling/04_Player_Protection_API.md) |
 | **Affordability 業務規則（SSOT）** | [Affordability Requirements](../../requirements/05_Risk_Compliance/09_Affordability_Requirements.md) |
 | **Affordability 架構實作** | [Affordability Implementation](09_Affordability_Implementation.md) |
 | **業務需求** | [Player_Protection_Requirements.md](../../requirements/05_Risk_Compliance/08_Player_Protection_Requirements.md) |
