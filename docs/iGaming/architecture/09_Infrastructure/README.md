@@ -46,6 +46,9 @@
 | [緩存策略](14_Caching_Strategy.md) | 緩存架構與策略 |
 | [成本優化架構](16_Cost_Optimization_Architecture.md) | 基礎設施成本優化 |
 | [容量規劃分析](23_Capacity_Planning_Analysis.md) ⭐ NEW | 容量規劃分析（100K 用戶、10K DAU、120 TPS、$3.05M/年） |
+| [資料庫故障恢復](24_Database_Failover_Recovery.md) ⭐ NEW | PostgreSQL HA、Patroni 自動故障轉移、RTO < 30s / RPO < 5s |
+| [租戶成本分配](25_Cost_Allocation_Per_Tenant.md) ⭐ NEW | 多租戶成本透明度、自動帳單計算、MGA Financial Transparency |
+| [租戶遷移程序](26_Tenant_Migration_Procedures.md) ⭐ NEW | GDPR Art.17/20、Crypto-Shredding、Zero-Downtime Blue/Green 遷移 |
 
 ## 安全與 Token 管理
 
