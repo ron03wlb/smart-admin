@@ -61,14 +61,14 @@ const DictDataDrawer: React.FC<DictDataDrawerProps> = ({ visible, dictId, dictCo
 
       // 轉換為 DictDataVO 格式
       const dataWithEnabled = res.data.map(item => ({
-        dictDataId: 0, // TODO: 需要從 API 返回
-        dictId: dictId,
+        dictDataId: item.dictDataId,
+        dictId: item.dictId || dictId,
         dictCode: item.dictCode,
         dataValue: item.dataValue,
         dataLabel: item.dataLabel,
-        sortOrder: item.dataSort,
+        sortOrder: item.sortOrder,
         remark: item.remark,
-        disabledFlag: item.dictDisabledFlag ? 1 : 0,
+        disabledFlag: item.disabledFlag ? 1 : 0,
         enabled: !item.dictDisabledFlag,
       }));
 

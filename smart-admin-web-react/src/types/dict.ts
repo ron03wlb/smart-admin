@@ -21,13 +21,18 @@ export interface DictItem {
  * 字典數據項
  */
 export interface DictDataItem {
+  dictDataId: number;
+  dictId: number;
   dictCode: string;
   dictName: string;
   dictDisabledFlag: boolean;
   dataValue: string;
   dataLabel: string;
-  dataSort: number;
+  sortOrder: number;
   remark?: string;
+  disabledFlag: boolean;
+  createTime?: string;
+  updateTime?: string;
 }
 
 /**
@@ -63,6 +68,6 @@ export interface DictDataForm {
   dictId: number;
   dataValue: string;
   dataLabel: string;
-  dataSort: number;
+  sortOrder: number;
   remark?: string;
 }

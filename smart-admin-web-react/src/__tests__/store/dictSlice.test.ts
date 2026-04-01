@@ -9,10 +9,10 @@ import type { DictDataItem } from '@/types/dict';
 import type { RootState } from '@/store';
 
 const SAMPLE_DICT_DATA: DictDataItem[] = [
-  { dictCode: 'GENDER', dictName: '性別', dictDisabledFlag: false, dataValue: '1', dataLabel: '男', dataSort: 1 },
-  { dictCode: 'GENDER', dictName: '性別', dictDisabledFlag: false, dataValue: '2', dataLabel: '女', dataSort: 2 },
-  { dictCode: 'STATUS', dictName: '狀態', dictDisabledFlag: false, dataValue: '1', dataLabel: '啟用', dataSort: 1 },
-  { dictCode: 'STATUS', dictName: '狀態', dictDisabledFlag: false, dataValue: '0', dataLabel: '停用', dataSort: 2 },
+  { dictCode: 'GENDER', dictName: '性別', dictDisabledFlag: false, dataValue: '1', dataLabel: '男', sortOrder: 1 },
+  { dictCode: 'GENDER', dictName: '性別', dictDisabledFlag: false, dataValue: '2', dataLabel: '女', sortOrder: 2 },
+  { dictCode: 'STATUS', dictName: '狀態', dictDisabledFlag: false, dataValue: '1', dataLabel: '啟用', sortOrder: 1 },
+  { dictCode: 'STATUS', dictName: '狀態', dictDisabledFlag: false, dataValue: '0', dataLabel: '停用', sortOrder: 2 },
 ];
 
 describe('dictSlice', () => {
@@ -44,7 +44,7 @@ describe('dictSlice', () => {
   it('should replace dict data on re-init', () => {
     const state1 = dictReducer(undefined, initDictData(SAMPLE_DICT_DATA));
     const newData: DictDataItem[] = [
-      { dictCode: 'COLOR', dictName: '顏色', dictDisabledFlag: false, dataValue: 'R', dataLabel: '紅', dataSort: 1 },
+      { dictCode: 'COLOR', dictName: '顏色', dictDisabledFlag: false, dataValue: 'R', dataLabel: '紅', sortOrder: 1 },
     ];
     const state2 = dictReducer(state1, initDictData(newData));
 

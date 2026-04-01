@@ -11,9 +11,9 @@ function renderWithStore(ui: React.ReactElement, storeOverrides?: any) {
       dictList: [],
       dictMap: {
         GOODS_PLACE: [
-          { dictCode: 'GOODS_PLACE', dictName: '商品產地', dictDisabledFlag: false, dataValue: 'CN', dataLabel: '中国', dataSort: 1 },
-          { dictCode: 'GOODS_PLACE', dictName: '商品產地', dictDisabledFlag: false, dataValue: 'US', dataLabel: '美国', dataSort: 2 },
-          { dictCode: 'GOODS_PLACE', dictName: '商品產地', dictDisabledFlag: true, dataValue: 'JP', dataLabel: '日本', dataSort: 3 },
+          { dictCode: 'GOODS_PLACE', dictName: '商品產地', dictDisabledFlag: false, dataValue: 'CN', dataLabel: '中国', sortOrder: 1 },
+          { dictCode: 'GOODS_PLACE', dictName: '商品產地', dictDisabledFlag: false, dataValue: 'US', dataLabel: '美国', sortOrder: 2 },
+          { dictCode: 'GOODS_PLACE', dictName: '商品產地', dictDisabledFlag: true, dataValue: 'JP', dataLabel: '日本', sortOrder: 3 },
         ],
       },
     },

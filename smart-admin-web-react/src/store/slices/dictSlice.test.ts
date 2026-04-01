@@ -39,7 +39,7 @@ const mockDictDataList: DictDataItem[] = [
     dataValue: '1',
     dataLabel: '中國',
     dictDisabledFlag: false,
-    dataSort: 1,
+    sortOrder: 1,
   },
   {
     dictCode: 'GOODS_PLACE',
@@ -47,7 +47,7 @@ const mockDictDataList: DictDataItem[] = [
     dataValue: '2',
     dataLabel: '美國',
     dictDisabledFlag: false,
-    dataSort: 1,
+    sortOrder: 1,
   },
   {
     dictCode: 'GOODS_PLACE',
@@ -55,7 +55,7 @@ const mockDictDataList: DictDataItem[] = [
     dataValue: '3',
     dataLabel: '日本',
     dictDisabledFlag: false,
-    dataSort: 1,
+    sortOrder: 1,
   },
   {
     dictCode: 'USER_STATUS',
@@ -63,7 +63,7 @@ const mockDictDataList: DictDataItem[] = [
     dataValue: '1',
     dataLabel: '啟用',
     dictDisabledFlag: false,
-    dataSort: 1,
+    sortOrder: 1,
   },
   {
     dictCode: 'USER_STATUS',
@@ -71,7 +71,7 @@ const mockDictDataList: DictDataItem[] = [
     dataValue: '0',
     dataLabel: '禁用',
     dictDisabledFlag: false,
-    dataSort: 1,
+    sortOrder: 1,
   },
   {
     dictCode: 'ORDER_STATUS',
@@ -79,7 +79,7 @@ const mockDictDataList: DictDataItem[] = [
     dataValue: '10',
     dataLabel: '待支付',
     dictDisabledFlag: false,
-    dataSort: 1,
+    sortOrder: 1,
   },
   {
     dictCode: 'ORDER_STATUS',
@@ -87,7 +87,7 @@ const mockDictDataList: DictDataItem[] = [
     dataValue: '20',
     dataLabel: '已支付',
     dictDisabledFlag: false,
-    dataSort: 1,
+    sortOrder: 1,
   },
 ];
 
@@ -156,7 +156,7 @@ describe('dictSlice', () => {
           dataValue: '1',
           dataLabel: '選項1',
           dictDisabledFlag: false,
-          dataSort: 1,
+          sortOrder: 1,
         },
         {
           dictCode: 'TEST_CODE',
@@ -164,7 +164,7 @@ describe('dictSlice', () => {
           dataValue: '2',
           dataLabel: '選項2',
           dictDisabledFlag: false,
-          dataSort: 2,
+          sortOrder: 2,
         },
       ];
 
@@ -258,7 +258,7 @@ describe('dictSlice', () => {
               dataValue: '1',
               dataLabel: '選項1',
               dictDisabledFlag: false,
-              dataSort: 1,
+              sortOrder: 1,
             },
           ],
         },
@@ -472,7 +472,7 @@ describe('dictSlice', () => {
           dataValue: String(i),
           dataLabel: `選項${i}`,
           dictDisabledFlag: false,
-          dataSort: i,
+          sortOrder: i,
         });
       }
 
