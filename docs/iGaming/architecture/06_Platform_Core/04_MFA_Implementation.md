@@ -1201,9 +1201,9 @@ CREATE INDEX idx_webauthn_credential_id ON t_webauthn_credential(credential_id);
 
 ## 相關文檔（Related Documents）
 
-- [MFA_Technical_Architecture.md](./03_MFA_Technical_Architecture.md) - MFA 系統架構設計
-- [MFA_Compliance_Validation.md](./08_MFA_Compliance_Validation.md) - 合規驗證技術設計
-- [MFA_Recovery_Implementation.md](./09_MFA_Recovery_Implementation.md) - 恢復流程技術實現
+- [MFA_Architecture.md](./03_MFA_Architecture.md) - MFA 系統架構設計
+- [MFA_Compliance.md](./05_MFA_Compliance.md) - 合規驗證技術設計
+- [MFA_Recovery.md](./06_MFA_Recovery.md) - 恢復流程技術實現
 
 ---
 

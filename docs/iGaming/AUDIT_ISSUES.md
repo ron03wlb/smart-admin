@@ -253,7 +253,7 @@
 |------|------|------|
 | [B00] | 更新 STANDARDS.md（Section 3.4–3.6）+ 重建 AUDIT_ISSUES.md | ✅ 已完成 |
 | [B01] | Broken Link 快速修復（BL-01 to BL-06，6 個已知目標） | ✅ 已完成 |
-| [B02] | MFA Orphaned Refs 清理（BL-07 to BL-09） | ⏳ 待處理 |
+| [B02] | MFA Orphaned Refs 清理（BL-07 to BL-09） | ✅ 已完成 |
 | [B03] | E-02 Player Protection API 雙向 XREF 修復（BL-10, BL-11） | ⏳ 待處理 |
 | [B04] | Seamless Wallet API Spec Path 修復（BL-12） | ⏳ 待處理 |
 | [B05] | Requirements XREF Audit — 01, 02 模組 | ⏳ 待處理 |

@@ -398,8 +398,8 @@ public class MFAEnforcementPolicy {
 - [MFA_Architecture_Spec.md](../../requirements/06_Governance_Licensing/03_MFA_Architecture_Spec.md) - MFA 方法選擇、風險分析、決策矩陣
 
 ### 技術實作（Technical Implementation）
-- [MFA_Login_Recovery_Technical.md](10_MFA_Login_Recovery_Technical.md) - 兩階段登入、信任裝置權杖
-- [MFA_Compliance_Technical.md](07_MFA_Compliance_Technical.md) - 稽核日誌、備份碼、合規驗證
+- [MFA_Recovery.md](06_MFA_Recovery.md) - 兩階段登入、信任裝置權杖
+- [MFA_Compliance.md](05_MFA_Compliance.md) - 稽核日誌、備份碼、合規驗證
 
 ### 安全標準（Security Standards）
 - **NIST SP 800-63B**: 數位身分指南（AAL2/AAL3）

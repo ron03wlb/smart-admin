@@ -978,8 +978,8 @@ sequenceDiagram
 - [MFA_Compliance_Requirements.md](../../requirements/06_Governance_Licensing/05_MFA_Compliance_Requirements.md) - 備份碼規格、恢復流程、審計需求
 
 ### 技術實現（Technical Implementation）
-- [MFA_Technical_Evaluation.md](05_MFA_Technical_Evaluation.md) - TOTP 演算法、AES-256-GCM 加密
-- [MFA_Login_Recovery_Technical.md](10_MFA_Login_Recovery_Technical.md) - 兩階段登入、會話儲存
+- [MFA_Architecture.md](03_MFA_Architecture.md) - TOTP 演算法、AES-256-GCM 加密
+- [MFA_Recovery.md](06_MFA_Recovery.md) - 兩階段登入、會話儲存
 
 ### 安全標準（Security Standards）
 - **NIST SP 800-63B**: 數位身份指南（備份驗證器、審計需求）
