@@ -1,13 +1,12 @@
 /**
  * Notice Form Drawer Component
- * 通知公告表單 Drawer 組件
  *
  * @Author: SmartAdmin React Team
  * @Date: 2026-03-11
  */
 
 import React, { useEffect } from 'react';
-import { Drawer, Form, Input, message, Select } from 'antd';
+import { Drawer, Form, Input, message, Select, Button, Space } from 'antd';
 import { noticeApi } from '@/api/business/noticeApi';
 import type {
   NoticeVO,
@@ -18,6 +17,7 @@ import type {
 } from '../types';
 import { useModal } from '@/hooks/useModal';
 import { NOTICE_VALIDATION } from '@/constants/business/noticeConst';
+import RichTextEditor from '@/components/RichTextEditor/RichTextEditor';
 
 interface NoticeFormDrawerProps {
   visible: boolean;
@@ -42,43 +42,43 @@ export default function NoticeFormDrawer({
   });
 
   /**
-   * 表單驗證規則
+   * Validation rules
    */
   const rules = {
     title: [
-      { required: true, message: '請輸入公告標題' },
+      { required: true, message: '请输入公告标题' },
       {
         max: NOTICE_VALIDATION.TITLE_MAX_LENGTH,
-        message: `標題最多${NOTICE_VALIDATION.TITLE_MAX_LENGTH}個字符`,
+        message: `标题最多${NOTICE_VALIDATION.TITLE_MAX_LENGTH}个字符`,
       },
     ],
-    noticeTypeId: [{ required: true, message: '請選擇分類' }],
+    noticeTypeId: [{ required: true, message: '请选择分类' }],
     author: [
-      { required: true, message: '請輸入作者' },
+      { required: true, message: '请输入作者' },
       {
         max: NOTICE_VALIDATION.AUTHOR_MAX_LENGTH,
-        message: `作者最多${NOTICE_VALIDATION.AUTHOR_MAX_LENGTH}個字符`,
+        message: `作者最多${NOTICE_VALIDATION.AUTHOR_MAX_LENGTH}个字符`,
       },
     ],
     source: [
-      { required: true, message: '請輸入來源' },
+      { required: true, message: '请输入来源' },
       {
         max: NOTICE_VALIDATION.SOURCE_MAX_LENGTH,
-        message: `來源最多${NOTICE_VALIDATION.SOURCE_MAX_LENGTH}個字符`,
+        message: `来源最多${NOTICE_VALIDATION.SOURCE_MAX_LENGTH}个字符`,
       },
     ],
-    allVisibleFlag: [{ required: true, message: '請選擇可見範圍' }],
-    contentHtml: [{ required: true, message: '請輸入公告內容' }],
+    allVisibleFlag: [{ required: true, message: '请选择可见范围' }],
+    contentHtml: [{ required: true, message: '请输入公告内容' }],
     documentNumber: [
       {
         max: NOTICE_VALIDATION.DOCUMENT_NUMBER_MAX_LENGTH,
-        message: `文號最多${NOTICE_VALIDATION.DOCUMENT_NUMBER_MAX_LENGTH}個字符`,
+        message: `文号最多${NOTICE_VALIDATION.DOCUMENT_NUMBER_MAX_LENGTH}个字符`,
       },
     ],
   };
 
   /**
-   * 表單提交
+   * Form submit
    */
   const handleSubmit = async () => {
     try {
@@ -86,7 +86,6 @@ export default function NoticeFormDrawer({
       setLoading(true);
 
       if (isEdit && initialData) {
-        // 編輯模式
         const updateForm: NoticeUpdateForm = {
           noticeId: initialData.noticeId,
           title: values.title!,
@@ -105,7 +104,6 @@ export default function NoticeFormDrawer({
           onSuccess();
         }
       } else {
-        // 新增模式
         const addForm: NoticeAddForm = {
           title: values.title!,
           noticeTypeId: values.noticeTypeId!,
@@ -125,7 +123,7 @@ export default function NoticeFormDrawer({
       }
     } catch (error) {
       if (error instanceof Error) {
-        message.error(error.message || (isEdit ? '更新失敗' : '新增失敗'));
+        message.error(error.message || (isEdit ? '更新失败' : '新增失败'));
       }
       console.error(error);
     } finally {
@@ -133,16 +131,13 @@ export default function NoticeFormDrawer({
     }
   };
 
-  /**
-   * Drawer 關閉處理
-   */
   const handleCancel = () => {
     form.resetFields();
     onCancel();
   };
 
   /**
-   * 初始化表單數據（編輯模式）
+   * Initialize form data (edit mode)
    */
   useEffect(() => {
     if (visible && initialData) {
@@ -154,66 +149,40 @@ export default function NoticeFormDrawer({
         source: initialData.source,
         allVisibleFlag: initialData.allVisibleFlag ? 1 : 0,
         publishTime: initialData.publishTime,
-        contentHtml: '', // TODO: 需要從API獲取完整內容
+        contentHtml: '', // Content loaded from detail API in parent or via separate call
       });
     } else if (visible && !initialData) {
       form.resetFields();
-      // 設置默認值
       form.setFieldsValue({
-        allVisibleFlag: 1, // 默認全部可見
+        allVisibleFlag: 1,
       });
     }
   }, [visible, initialData, form]);
 
   return (
     <Drawer
-      title={isEdit ? '編輯通知公告' : '新增通知公告'}
+      title={isEdit ? '编辑通知公告' : '新增通知公告'}
       open={visible}
       onClose={handleCancel}
       width={800}
       destroyOnClose
-      footer={
-        <div style={{ textAlign: 'right' }}>
-          <button
-            type="button"
-            onClick={handleCancel}
-            style={{
-              marginRight: 8,
-              padding: '4px 15px',
-              border: '1px solid #d9d9d9',
-              borderRadius: '2px',
-              background: '#fff',
-              cursor: 'pointer',
-            }}
-          >
-            取消
-          </button>
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={loading}
-            style={{
-              padding: '4px 15px',
-              border: 'none',
-              borderRadius: '2px',
-              background: '#1890ff',
-              color: '#fff',
-              cursor: loading ? 'not-allowed' : 'pointer',
-            }}
-          >
-            {loading ? '提交中...' : '提交'}
-          </button>
-        </div>
+      extra={
+        <Space>
+          <Button onClick={handleCancel}>取消</Button>
+          <Button type="primary" onClick={handleSubmit} loading={loading}>
+            提交
+          </Button>
+        </Space>
       }
     >
       <Form form={form} layout="vertical" preserve={false} style={{ marginTop: 16 }}>
-        <Form.Item label="公告標題" name="title" rules={rules.title}>
-          <Input placeholder="請輸入公告標題" maxLength={NOTICE_VALIDATION.TITLE_MAX_LENGTH} />
+        <Form.Item label="公告标题" name="title" rules={rules.title}>
+          <Input placeholder="请输入公告标题" maxLength={NOTICE_VALIDATION.TITLE_MAX_LENGTH} />
         </Form.Item>
 
-        <Form.Item label="分類" name="noticeTypeId" rules={rules.noticeTypeId}>
+        <Form.Item label="分类" name="noticeTypeId" rules={rules.noticeTypeId}>
           <Select
-            placeholder="請選擇分類"
+            placeholder="请选择分类"
             options={noticeTypeList.map(item => ({
               label: item.noticeTypeName,
               value: item.noticeTypeId,
@@ -222,42 +191,34 @@ export default function NoticeFormDrawer({
         </Form.Item>
 
         <Form.Item
-          label="文號"
+          label="文号"
           name="documentNumber"
           rules={rules.documentNumber}
-          tooltip="例如：1024創新實驗室發〔2022〕字第36號"
+          tooltip="例如：1024创新实验室发〔2022〕字第36号"
         >
           <Input
-            placeholder="請輸入文號（可選）"
+            placeholder="请输入文号（可选）"
             maxLength={NOTICE_VALIDATION.DOCUMENT_NUMBER_MAX_LENGTH}
           />
         </Form.Item>
 
         <Form.Item label="作者" name="author" rules={rules.author}>
-          <Input placeholder="請輸入作者" maxLength={NOTICE_VALIDATION.AUTHOR_MAX_LENGTH} />
+          <Input placeholder="请输入作者" maxLength={NOTICE_VALIDATION.AUTHOR_MAX_LENGTH} />
         </Form.Item>
 
-        <Form.Item label="來源" name="source" rules={rules.source}>
-          <Input placeholder="請輸入來源" maxLength={NOTICE_VALIDATION.SOURCE_MAX_LENGTH} />
+        <Form.Item label="来源" name="source" rules={rules.source}>
+          <Input placeholder="请输入来源" maxLength={NOTICE_VALIDATION.SOURCE_MAX_LENGTH} />
         </Form.Item>
 
-        <Form.Item label="可見範圍" name="allVisibleFlag" rules={rules.allVisibleFlag}>
-          <Select placeholder="請選擇可見範圍">
-            <Select.Option value={1}>全部可見</Select.Option>
-            <Select.Option value={0}>部分可見</Select.Option>
+        <Form.Item label="可见范围" name="allVisibleFlag" rules={rules.allVisibleFlag}>
+          <Select placeholder="请选择可见范围">
+            <Select.Option value={1}>全部可见</Select.Option>
+            <Select.Option value={0}>部分可见</Select.Option>
           </Select>
         </Form.Item>
 
-        <Form.Item
-          label="公告內容"
-          name="contentHtml"
-          rules={rules.contentHtml}
-          tooltip="TODO: 應使用富文本編輯器組件"
-        >
-          <Input.TextArea
-            placeholder="請輸入公告內容（暫用純文本，後續應使用富文本編輯器）"
-            rows={8}
-          />
+        <Form.Item label="公告内容" name="contentHtml" rules={rules.contentHtml}>
+          <RichTextEditor placeholder="请输入公告内容" />
         </Form.Item>
       </Form>
     </Drawer>
