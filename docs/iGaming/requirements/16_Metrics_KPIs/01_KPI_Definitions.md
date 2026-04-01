@@ -4,6 +4,7 @@
 > **文件類型**: 業務需求 - KPI 定義與計算標準
 > **XREF**: 詳細報表需求見 [報表需求](../08_Analytics_Operations/01_Reporting_Requirements.md) | BI 儀表板見 [BI 需求](../08_Analytics_Operations/02_BI_Dashboard_Requirements.md)
 > **最後更新**: 2026-03-31
+> **Related Architecture**: [Analytics Service Overview](../../architecture/08_Analytics_Service/01_Reporting_Architecture.md)
 
 ---
 

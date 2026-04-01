@@ -12,7 +12,7 @@
 |------|------|--------|--------|
 | Broken links | 28 | 28 | 0 |
 | 缺失文件（DOCS_SPEC 宣稱存在） | 17 | 0 | 17 |
-| XREF 前向連結缺失（requirements） | 4 | 0 | 4 |
+| XREF 前向連結缺失（requirements） | 4 | 4 | 0 |
 | XREF 後向連結缺失（architecture） | 16 | 0 | 16 |
 | Mermaid 缺失（architecture） | 7 | 0 | 7 |
 | DOCS_SPEC.md 不存在 | 1 | 0 | 1 |
@@ -256,10 +256,10 @@
 | [B02] | MFA Orphaned Refs 清理（BL-07 to BL-09） | ✅ 已完成 |
 | [B03] | E-02 Player Protection API 雙向 XREF 修復（BL-10, BL-11） | ✅ 已完成 |
 | [B04] | Seamless Wallet API Spec Path 修復（BL-12） | ✅ 已完成 |
-| [B05] | Requirements XREF Audit — 01, 02 模組 | ⏳ 待處理 |
-| [B06] | Requirements XREF Audit — 03, 04, 05 模組 | ⏳ 待處理 |
-| [B07] | Requirements XREF Audit — 06, 07, 08, 09 模組 | ⏳ 待處理 |
-| [B08] | Requirements XREF Audit — 10, 11, 12, 13, 14, 15 模組 | ⏳ 待處理 |
+| [B05] | Requirements XREF Audit — 01, 02 模組 | ✅ 已完成（原已覆蓋） |
+| [B06] | Requirements XREF Audit — 03, 04, 05 模組 | ✅ 已完成（原已覆蓋） |
+| [B07] | Requirements XREF Audit — 06, 07, 08, 09 模組 | ✅ 已完成（原已覆蓋） |
+| [B08] | Requirements XREF Audit — 10, 11, 12, 13, 14, 15 模組 | ✅ 已完成（補 3 個文件） |
 | [B09] | 建立 MF-01 KYC 狀態機架構文件 | ⏳ 待處理 |
 | [B10] | 建立 MF-02 帳戶生命週期管理架構文件 | ⏳ 待處理 |
 | [B11] | 建立 MF-03 多幣種兌換管理架構文件 | ⏳ 待處理 |

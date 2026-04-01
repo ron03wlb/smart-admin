@@ -4,6 +4,7 @@
 > **文件類型**: 業務需求 - 運營與業務指標
 > **XREF**: KPI 定義與計算公式見 [KPI 定義](01_KPI_Definitions.md) | 報表架構見 [報表需求](../08_Analytics_Operations/01_Reporting_Requirements.md)
 > **最後更新**: 2026-03-31
+> **Related Architecture**: [Analytics Service Overview](../../architecture/08_Analytics_Service/01_Reporting_Architecture.md)
 
 ---
 

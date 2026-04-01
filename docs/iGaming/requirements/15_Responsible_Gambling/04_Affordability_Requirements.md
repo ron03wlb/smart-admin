@@ -2,6 +2,7 @@
 
 > **SSOT 文件**：`05_Risk_Compliance/09_Affordability_Requirements.md` 為可負擔性評估的唯一事實來源（SSOT），包含完整的業務規則（閾值、觸發條件、審查週期）。
 > 詳見：[Affordability 需求（SSOT）](../05_Risk_Compliance/09_Affordability_Requirements.md)
+> **Related Architecture**: [Player Protection API](../../architecture/15_Responsible_Gambling/04_Player_Protection_API.md)
 
 本文件僅保留**負責任博弈（RG）視角**的特有內容，不重複定義已在 SSOT 中定義的業務規則。
 
