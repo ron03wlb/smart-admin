@@ -34,11 +34,11 @@ const EnterpriseDetail: React.FC = () => {
       <Descriptions title="企业信息" bordered column={2} size="small" style={{ marginBottom: 24 }}>
         <Descriptions.Item label="企业名称">{enterprise.enterpriseName}</Descriptions.Item>
         <Descriptions.Item label="信用代码">{enterprise.unifiedSocialCreditCode}</Descriptions.Item>
-        <Descriptions.Item label="联系人">{enterprise.contactName}</Descriptions.Item>
+        <Descriptions.Item label="联系人">{enterprise.contact}</Descriptions.Item>
         <Descriptions.Item label="联系电话">{enterprise.contactPhone}</Descriptions.Item>
         <Descriptions.Item label="邮箱">{enterprise.email}</Descriptions.Item>
         <Descriptions.Item label="状态"><Tag color={enterprise.disabledFlag ? 'red' : 'green'}>{enterprise.disabledFlag ? '禁用' : '正常'}</Tag></Descriptions.Item>
-        <Descriptions.Item label="地址" span={2}>{[enterprise.province, enterprise.city, enterprise.district, enterprise.address].filter(Boolean).join(' ')}</Descriptions.Item>
+        <Descriptions.Item label="地址" span={2}>{[enterprise.provinceName, enterprise.cityName, enterprise.districtName, enterprise.address].filter(Boolean).join(' ')}</Descriptions.Item>
       </Descriptions>
       <Tabs items={[
         { key: 'employee', label: '企业员工', children: <EnterpriseEmployeeList enterpriseId={enterpriseId} /> },

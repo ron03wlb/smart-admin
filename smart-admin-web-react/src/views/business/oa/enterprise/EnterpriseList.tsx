@@ -57,7 +57,7 @@ const EnterpriseList: React.FC = () => {
   const columns: ColumnsType<EnterpriseVO> = [
     { title: '企业名称', dataIndex: 'enterpriseName', width: 200, ellipsis: true },
     { title: '统一社会信用代码', dataIndex: 'unifiedSocialCreditCode', width: 200 },
-    { title: '联系人', dataIndex: 'contactName', width: 100 },
+    { title: '联系人', dataIndex: 'contact', width: 100 },
     { title: '联系电话', dataIndex: 'contactPhone', width: 130 },
     { title: '状态', dataIndex: 'disabledFlag', width: 80, align: 'center', render: (val) => <Tag color={val ? 'red' : 'green'}>{val ? '禁用' : '正常'}</Tag> },
     { title: '创建时间', dataIndex: 'createTime', width: 170 },

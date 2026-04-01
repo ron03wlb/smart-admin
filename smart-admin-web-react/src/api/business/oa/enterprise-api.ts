@@ -7,15 +7,19 @@ export interface EnterpriseVO {
   enterpriseLogo?: string;
   unifiedSocialCreditCode?: string;
   type?: number;
-  contactName?: string;
+  /** Backend field name is 'contact' (not 'contactName') */
+  contact?: string;
   contactPhone?: string;
   email?: string;
-  province?: string;
-  provinceCode?: string;
-  city?: string;
-  cityCode?: string;
-  district?: string;
-  districtCode?: string;
+  /** Province code (integer) */
+  province?: number;
+  provinceName?: string;
+  /** City code (integer) */
+  city?: number;
+  cityName?: string;
+  /** District code (integer) */
+  district?: number;
+  districtName?: string;
   address?: string;
   businessLicense?: string;
   disabledFlag: boolean;
@@ -36,17 +40,19 @@ export interface EnterpriseAddForm {
   enterpriseLogo?: string;
   unifiedSocialCreditCode?: string;
   type?: number;
-  contactName?: string;
+  /** Backend field: contact (required) */
+  contact?: string;
   contactPhone?: string;
   email?: string;
-  provinceCode?: string;
-  province?: string;
-  cityCode?: string;
-  city?: string;
-  districtCode?: string;
-  district?: string;
+  province?: number;
+  provinceName?: string;
+  city?: number;
+  cityName?: string;
+  district?: number;
+  districtName?: string;
   address?: string;
   businessLicense?: string;
+  disabledFlag?: boolean;
 }
 
 export interface EnterpriseUpdateForm extends EnterpriseAddForm {
