@@ -1,6 +1,6 @@
 # iGaming 文檔規範標準 (Documentation Standards)
 
-> **版本**: 1.0.0 | **生效日期**: 2026-03-31 | **狀態**: ACTIVE
+> **版本**: 1.1.0 | **生效日期**: 2026-04-02 | **狀態**: ACTIVE
 
 本文件是 `docs/iGaming/` 所有文件的規範 SSOT（Single Source of Truth）。
 所有文件整理工作必須遵循以下規則。
@@ -128,6 +128,43 @@ NN_Feature_Description.md    （數字前綴 + 底線 + 功能描述）
 
 本文件僅涵蓋負責任賭博脈絡下的 Affordability 執行面，技術觸發邏輯詳見上方 XREF。
 ```
+
+### 3.4 等效 XREF Header 格式（v1.1.0 新增）
+
+為避免大量格式統一導致的高風險批次修改，以下三種 header 格式**均視為合規**，不強制轉換現有文件：
+
+| 格式 | 範例 | 使用場景 |
+|------|------|---------|
+| 標準格式 | `> **XREF（交叉引用）**: ...` | 新建文件必須使用 |
+| Requirements 前向連結 | `> **Related Architecture**: [標題](路徑)` | requirements/ 舊有文件 |
+| Architecture 後向連結 | `> **Business Requirements**: [標題](路徑)` | architecture/ 舊有文件 |
+
+**規則**：
+- 新建文件：必須使用標準格式 `> **XREF（交叉引用）**:`
+- 現有文件：僅在需要修改 header 內容（如補充缺失連結）時才統一為標準格式，否則保留原格式
+- 連結路徑有效性：所有格式下的連結路徑都必須有效（validate_links.sh 通過）
+
+### 3.5 Mermaid 豁免清單（v1.1.0 新增）
+
+下列文件類型**豁免** Mermaid 圖表要求，在計算覆蓋率時不計入分母：
+
+- **Index / 導航文件**：`01_Seamless_Wallet_Index.md`、模組 README.md 等以表格為主的索引文件
+- **API Listing 文件**：`07_Domain_APIs.md` 等純 API 清單文件
+- **Migration Log / Sprint 報告**：`phase2-week1-*.md`、`sprint4-*.md` 等施工紀錄
+- **Glossary / 術語文件**：`TRANSLATION_GLOSSARY.md`、各模組術語對照表
+
+豁免文件應在 README.md 的文件列表中以「📋 索引」或「📝 紀錄」標示，與「✅ 架構文件」區分。
+
+### 3.6 Implementation 層範圍邊界（v1.1.0 新增）
+
+`implementation/` 目錄維持**平層結構**（不建立 phase 子目錄），原因：
+- 現有 17 個文件已建立在平層，重組會導致大量 XREF path 失效
+- SmartAdmin 為模組化單體架構，實作文件與架構文件一一對應，不需要 phase 分層
+
+**範圍邊界**：
+- Phase 0–3 模組（Database、Finance、Game Integration、Risk Engine）有獨立實作文件
+- Phase 4–5 模組（Activity、Analytics、Security、Frontend）的實作細節**嵌入對應的 architecture 文件**（此為有意設計，非缺失）
+- Sprint 報告類文件（`sprint4-*.md`、`phase2-week1-*.md`）歸類為歷史施工紀錄，**豁免 XREF 要求**
 
 ---
 

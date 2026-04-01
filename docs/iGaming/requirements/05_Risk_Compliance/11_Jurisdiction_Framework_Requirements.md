@@ -2,7 +2,7 @@
 
 > **規範來源**: [06-07_Multi_Jurisdiction_Framework.md](../../source-archive/06_Platform_Governance/06-07_Multi_Jurisdiction_Framework.md)
 > **目標讀者**: 高管、合規官
-> **相關架構**: [Jurisdiction_Routing_Architecture.md](../../architecture/06_Platform_Core/11_Jurisdiction_Routing_Architecture.md)
+> **相關架構**: [Jurisdiction_Routing_Architecture.md](../../architecture/06_Platform_Core/07_Jurisdiction_Routing_Architecture.md)
 > **最後同步**: 2026-02-08
 
 ---
@@ -244,4 +244,4 @@
 
 ### 技術實現
 
-→ **[Jurisdiction Routing Architecture](../../architecture/06_Platform_Core/11_Jurisdiction_Routing_Architecture.md)** - 多司法管轄區配置系統、監管規則引擎、特定司法管轄區功能標誌、合規執行機制和審計追蹤日誌
+→ **[Jurisdiction Routing Architecture](../../architecture/06_Platform_Core/07_Jurisdiction_Routing_Architecture.md)** - 多司法管轄區配置系統、監管規則引擎、特定司法管轄區功能標誌、合規執行機制和審計追蹤日誌

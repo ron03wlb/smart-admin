@@ -1152,7 +1152,7 @@ CREATE POLICY tenant_isolation ON t_game_round
 | [03_Game_Integration_Security.md](../architecture/03_Game_Integration/03_Game_Integration_Security.md) | 遊戲整合安全 |
 | [05_Game_Lobby_System.md](../architecture/03_Game_Integration/05_Game_Lobby_System.md) | 遊戲大廳系統 |
 | [07_Reconciliation_Technical.md](../architecture/02_Finance_Service/07_Reconciliation_Technical.md) | 對帳技術文件 |
-| [08_Turnover_Calculation_Architecture.md](../architecture/02_Finance_Service/08_Turnover_Calculation_Architecture.md) | 有效投注額計算架構 |
+| [08_Turnover_Architecture.md](../architecture/02_Finance_Service/08_Turnover_Architecture.md) | 有效投注額計算架構 |
 | [TRANSLATION_GLOSSARY.md](../TRANSLATION_GLOSSARY.md) | 翻譯詞彙表 |
 
 ---

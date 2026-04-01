@@ -5,7 +5,7 @@
 > **前置閱讀**:
 > - [Seamless_Wallet_Technical.md](../architecture/02_Finance_Service/03_Seamless_Wallet_Technical.md) -- 回合狀態機、時序圖
 > - [Financial_Implementation.md](../architecture/02_Finance_Service/04_Financial_Implementation.md) -- t_wallet DDL、debit/credit/rollback 模式
-> - [Turnover_Calculation_Architecture.md](../architecture/02_Finance_Service/08_Turnover_Calculation_Architecture.md) -- 有效投注額 (Valid Turnover) 計算公式
+> - [Turnover_Calculation_Architecture.md](../architecture/02_Finance_Service/08_Turnover_Architecture.md) -- 有效投注額 (Valid Turnover) 計算公式
 > **文檔版本**: 1.0.0
 > **最後更新**: 2026-02-14
 > **維護團隊**: 後端團隊、財務團隊
@@ -1413,7 +1413,7 @@ public class ActivityWeightNode extends NodeComponent {
 | LOTTERY | 0.10 | 彩票 -- 低權重 |
 | PVP | 0.00 | 玩家對戰 -- 不計入 |
 
-> **交叉引用**: 完整的權重配置見 [Turnover_Calculation_Architecture.md Section 10.5](../architecture/02_Finance_Service/08_Turnover_Calculation_Architecture.md#105-配置定義)
+> **交叉引用**: 完整的權重配置見 [Turnover_Calculation_Architecture.md Section 10.5](../architecture/02_Finance_Service/08_Turnover_Architecture.md#105-配置定義)
 
 ---
 
@@ -1668,7 +1668,7 @@ alerts:
 |------|------|------|
 | 無縫錢包技術實作 | [03_Seamless_Wallet_Technical.md](../architecture/02_Finance_Service/03_Seamless_Wallet_Technical.md) | 回合狀態機、鎖順序、冪等三層 |
 | 金融實作架構 | [04_Financial_Implementation.md](../architecture/02_Finance_Service/04_Financial_Implementation.md) | t_wallet DDL、Outbox Pattern、SAGA |
-| 有效投注額計算 | [08_Turnover_Calculation_Architecture.md](../architecture/02_Finance_Service/08_Turnover_Calculation_Architecture.md) | 三層驗證、遊戲權重 |
+| 有效投注額計算 | [08_Turnover_Architecture.md](../architecture/02_Finance_Service/08_Turnover_Architecture.md) | 三層驗證、遊戲權重 |
 | 資料模型 | [04_Data_Model.md](../architecture/00_Overview/04_Data_Model.md) | 錢包總覽餘額計算 |
 
 ### 10.2 SmartAdmin 基礎模組依賴

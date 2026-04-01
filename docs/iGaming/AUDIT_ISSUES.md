@@ -1,11 +1,24 @@
 # iGaming 文檔整理問題清單 (Audit Issues)
 
-> **建立日期**: 2026-03-31 | **目的**: 記錄整理過程中發現的問題及解決狀態
-> 整理完成後本文件保留作為歷史記錄。
+> **建立日期**: 2026-03-31 | **更新日期**: 2026-04-02 | **目的**: 記錄整理過程中發現的問題及解決狀態
+> v1.0 任務（[01]–[25]）為 2026-03-31 重整的歷史記錄（已完成）。
+> v2.0 任務（[B01]–[B25]）為 2026-04-02 品質稽核發現的待處理問題（進行中）。
 
 ---
 
-## 問題統計（2026-03-31 重整完成）
+## 問題統計（v2.0 稽核 — 2026-04-02）
+
+| 類型 | 總數 | 已解決 | 待處理 |
+|------|------|--------|--------|
+| Broken links | 28 | 0 | 28 |
+| 缺失文件（DOCS_SPEC 宣稱存在） | 17 | 0 | 17 |
+| XREF 前向連結缺失（requirements） | 4 | 0 | 4 |
+| XREF 後向連結缺失（architecture） | 16 | 0 | 16 |
+| Mermaid 缺失（architecture） | 7 | 0 | 7 |
+| DOCS_SPEC.md 不存在 | 1 | 0 | 1 |
+| **合計** | **73** | **0** | **73** |
+
+## 問題統計（v1.0 歷史 — 2026-03-31 重整完成）
 
 | 類型 | 總數 | 已解決 | 待處理 |
 |------|------|--------|--------|
@@ -166,3 +179,101 @@
 | [23] | 產出品質報告 | ✅ 已完成 |
 | [24] | 最終驗收 | ✅ 已完成（所有 STANDARDS.md 項目通過）|
 | [25] | 最終提交 | ✅ 已完成 |
+
+---
+
+## v2.0 Live Tracker（2026-04-02 稽核發現）
+
+### Broken Links（28 條）
+
+| ID | 來源文件 | 損壞連結目標 | 根本原因 | 修復 Iteration |
+|----|---------|------------|---------|--------------|
+| BL-01 | `requirements/15_Responsible_Gambling/04_Affordability_Requirements.md` | `../../05_Risk_Compliance/09_Affordability_Requirements.md`（×4） | 路徑層級錯誤（應為 `../`） | Iter-1 |
+| BL-02 | `requirements/05_Risk_Compliance/11_Jurisdiction_Framework_Requirements.md` | `06_Platform_Core/11_Jurisdiction_Routing_Architecture.md`（×2） | 文件重新編號後 refs 未更新 | Iter-1 |
+| BL-03 | `implementation/01-wallet-design.md` | `08_Turnover_Calculation_Architecture.md`（×3） | 合併後重命名 | Iter-1 |
+| BL-04 | `implementation/02-game-integration.md` | `08_Turnover_Calculation_Architecture.md`（×1） | 合併後重命名 | Iter-1 |
+| BL-05 | `architecture/02_Finance_Service/04_Financial_Implementation.md` | `../../../../.agent/rules/foundation/F04-architecture-rules.md`（×1） | 外部 agent rules 路徑 | Iter-1 |
+| BL-06 | `architecture/03_Game_Integration/04_Turnover_Calculation_Logic.md` | `../../../../.agent/rules/foundation/F04-architecture-rules.md`（×1） | 外部 agent rules 路徑 | Iter-1 |
+| BL-07 | `architecture/06_Platform_Core/03_MFA_Architecture.md` | `07_MFA_Compliance_Technical.md`（×1）、`10_MFA_Login_Recovery_Technical.md`（×1） | MFA 8→4 合併後舊檔名 | Iter-2 |
+| BL-08 | `architecture/06_Platform_Core/04_MFA_Implementation.md` | `03_MFA_Technical_Architecture.md`（×1）、`08_MFA_Compliance_Validation.md`（×1）、`09_MFA_Recovery_Implementation.md`（×1） | 同上 | Iter-2 |
+| BL-09 | `architecture/06_Platform_Core/05_MFA_Compliance.md` | `05_MFA_Technical_Evaluation.md`（×1）、`10_MFA_Login_Recovery_Technical.md`（×1） | 同上 | Iter-2 |
+| BL-10 | `architecture/05_Risk_Engine/08_Player_Protection_API.md` | `../../15_Responsible_Gambling/04_Player_Protection_API.md`（×1） | 同層目錄路徑深度錯誤（應為 `../`） | Iter-3 |
+| BL-11 | `architecture/15_Responsible_Gambling/04_Player_Protection_API.md` | `../../05_Risk_Engine/08_Player_Protection_API.md`（×1） | 同上 | Iter-3 |
+| BL-12 | `architecture/02_Finance_Service/seamless-wallet-api-spec.md` | 4 條 root-relative 舊路徑 | 文件移入子目錄後 paths 未更新 | Iter-4 |
+
+### 缺失文件（17 個）
+
+| ID | 缺失文件路徑 | 類型 | 建立 Iteration |
+|----|------------|------|--------------|
+| MF-01 | `architecture/01_Player_Service/02_KYC_Progression_State_Machine.md` | architecture | Iter-9 |
+| MF-02 | `architecture/01_Player_Service/03_Account_Lifecycle_Management.md` | architecture | Iter-10 |
+| MF-03 | `architecture/02_Finance_Service/11_Multi_Currency_Exchange_Management.md` | architecture | Iter-11 |
+| MF-04 | `architecture/03_Game_Integration/07_Provider_Error_Recovery.md` | architecture | Iter-12 |
+| MF-05 | `architecture/09_Infrastructure/24_Database_Failover_Recovery.md` | architecture | Iter-13 |
+| MF-06 | `architecture/09_Infrastructure/25_Cost_Allocation_Per_Tenant.md` | architecture | Iter-14 |
+| MF-07 | `architecture/09_Infrastructure/26_Tenant_Migration_Procedures.md` | architecture | Iter-15 |
+| MF-08 | `requirements/02_Financial_Operations/05_Dunning_Retry_Management.md` | requirements | Iter-16 |
+| MF-09 | `requirements/02_Financial_Operations/06_Chargeback_Dispute_Resolution.md` | requirements | Iter-16 |
+| MF-10 | `requirements/02_Financial_Operations/07_Affiliate_Payout_Audit.md` | requirements | Iter-16 |
+| MF-11 | `requirements/01_Player_Experience/07_Account_Closure_Deletion.md` | requirements | Iter-16 |
+| MF-12 | `requirements/03_Gaming_Operations/05_Game_Provider_Error_Handling.md` | requirements | Iter-17 |
+| MF-13 | `requirements/03_Gaming_Operations/06_Seamless_Wallet_Callback_Recovery.md` | requirements | Iter-17 |
+| MF-14 | `requirements/05_Risk_Compliance/12_Affiliate_Fraud_Detection.md` | requirements | Iter-17 |
+| MF-15 | `requirements/06_Governance_Licensing/07_Regional_Jurisdiction_Rules.md` | requirements | Iter-17 |
+| MF-16 | `requirements/15_Responsible_Gambling/05_Cross_Operator_Self_Exclusion.md` | requirements | Iter-17 |
+| MF-17 | `requirements/15_Responsible_Gambling/06_Reality_Check_UX_Patterns.md` | requirements | Iter-17 |
+
+### XREF 連結缺失
+
+| ID | 模組 | 類型 | 修復 Iteration |
+|----|------|------|--------------|
+| XF-01 | `requirements/01_Player_Experience/` 部分文件 | 缺少 architecture 前向連結 | Iter-5 |
+| XF-02 | `requirements/03_Gaming_Operations/` 全部 4 個文件 | 缺少前向連結 | Iter-6 |
+| XF-03 | `requirements/04_Promotions_VIP/` 全部 3 個文件 | 缺少前向連結 | Iter-6 |
+| XF-04 | `requirements/06–09` 部分文件 | 缺少前向連結 | Iter-7 |
+| XA-01 | `architecture/09_Infrastructure/` 16 個文件 | 缺少 requirements 後向連結 | Iter-18/19 |
+| XA-02 | `architecture/00_Overview/03, 04` | 缺少 requirements 後向連結 | Iter-19 |
+| XA-03 | `architecture/02_Finance_Service/09_Turnover_Implementation.md` | 缺少後向連結 | Iter-20 |
+
+### Mermaid 缺失（7 個文件）
+
+| ID | 文件路徑 | 修復 Iteration |
+|----|---------|--------------|
+| MD-01 | `architecture/00_Overview/06_Cross_Module_Integration.md` | Iter-21 |
+| MD-02 | `architecture/02_Finance_Service/01_Seamless_Wallet_Index.md` | Iter-21 |
+| MD-03 | `architecture/09_Infrastructure/06_Common_Patterns.md` | Iter-21 |
+| MD-04 | `architecture/09_Infrastructure/09_Infrastructure_Implementation.md` | Iter-21 |
+| MD-05 | `architecture/09_Infrastructure/07_Domain_APIs.md` | Iter-21 |
+| MD-06 | `architecture/09_Infrastructure/04_API_Design_Principles.md` | Iter-21 |
+| MD-07 | `architecture/05_Risk_Engine/08_Player_Protection_API.md` | Iter-21 |
+
+### v2.0 進度追蹤
+
+| Task | 描述 | 狀態 |
+|------|------|------|
+| [B00] | 更新 STANDARDS.md（Section 3.4–3.6）+ 重建 AUDIT_ISSUES.md | ✅ 已完成 |
+| [B01] | Broken Link 快速修復（BL-01 to BL-06，6 個已知目標） | ✅ 已完成 |
+| [B02] | MFA Orphaned Refs 清理（BL-07 to BL-09） | ⏳ 待處理 |
+| [B03] | E-02 Player Protection API 雙向 XREF 修復（BL-10, BL-11） | ⏳ 待處理 |
+| [B04] | Seamless Wallet API Spec Path 修復（BL-12） | ⏳ 待處理 |
+| [B05] | Requirements XREF Audit — 01, 02 模組 | ⏳ 待處理 |
+| [B06] | Requirements XREF Audit — 03, 04, 05 模組 | ⏳ 待處理 |
+| [B07] | Requirements XREF Audit — 06, 07, 08, 09 模組 | ⏳ 待處理 |
+| [B08] | Requirements XREF Audit — 10, 11, 12, 13, 14, 15 模組 | ⏳ 待處理 |
+| [B09] | 建立 MF-01 KYC 狀態機架構文件 | ⏳ 待處理 |
+| [B10] | 建立 MF-02 帳戶生命週期管理架構文件 | ⏳ 待處理 |
+| [B11] | 建立 MF-03 多幣種兌換管理架構文件 | ⏳ 待處理 |
+| [B12] | 建立 MF-04 GP 錯誤恢復架構文件 | ⏳ 待處理 |
+| [B13] | 建立 MF-05 資料庫故障恢復架構文件 | ⏳ 待處理 |
+| [B14] | 建立 MF-06 租戶成本分配架構文件 | ⏳ 待處理 |
+| [B15] | 建立 MF-07 租戶遷移程序架構文件 | ⏳ 待處理 |
+| [B16] | 建立 MF-08 to MF-11（金融+玩家 requirements）| ⏳ 待處理 |
+| [B17] | 建立 MF-12 to MF-17（Gaming+Risk+RG requirements）| ⏳ 待處理 |
+| [B18] | Architecture 後向 XREF — 09_Infrastructure 前 8 個 | ⏳ 待處理 |
+| [B19] | Architecture 後向 XREF — 09_Infrastructure 後 8 個 + 00_Overview | ⏳ 待處理 |
+| [B20] | Architecture 後向 XREF — 02_Finance + 03_Game_Integration | ⏳ 待處理 |
+| [B21] | 補齊 7 個 Mermaid 圖（MD-01 to MD-07） | ⏳ 待處理 |
+| [B22] | Implementation 層 XREF Headers + README 修正 | ⏳ 待處理 |
+| [B23] | 新增 ADR-016 + ADR-017 + 更新 ADR INDEX | ⏳ 待處理 |
+| [B24] | 建立 DOCS_SPEC.md + 品質閘道測量 | ⏳ 待處理 |
+| [B25] | 最終品質審查 + 矛盾稽核 + Q2 品質報告 | ⏳ 待處理 |

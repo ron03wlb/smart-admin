@@ -1200,7 +1200,7 @@ public class TurnoverModuleArchitectureTest {
 - [Turnover_Business_Rules.md](../../requirements/03_Gaming_Operations/01_Turnover_Business_Rules.md)
 
 ### 架構依賴
-- [SmartAdmin Architecture Rules](../../../../.agent/rules/foundation/F04-architecture-rules.md)
+- [SmartAdmin Architecture Rules](../../../../CLAUDE.md#architecture)
 - [02-06 Wallet Architecture](../../source-archive/02_Finance_Center/02-06_Wallet_Architecture.md)
 
 ---

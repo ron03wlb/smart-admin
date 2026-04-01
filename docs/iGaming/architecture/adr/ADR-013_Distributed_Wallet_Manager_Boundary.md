@@ -7,7 +7,7 @@
 **相關文檔**:
 - [Financial_Implementation.md](../02_Finance_Service/04_Financial_Implementation.md) — Section 2.3 WalletManager
 - [Seamless_Wallet_Technical.md](../02_Finance_Service/03_Seamless_Wallet_Technical.md) — Section 5 ConcurrencyManager
-- [F04-architecture-rules.md](../../../.agent/rules/foundation/F04-architecture-rules.md) — SmartAdmin 架構規則
+- [SmartAdmin 架構規則](../../../CLAUDE.md#architecture)
 
 ---
 
