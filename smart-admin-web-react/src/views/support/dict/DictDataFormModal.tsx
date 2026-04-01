@@ -56,7 +56,7 @@ const DictDataFormModal: React.FC<Props> = ({ open, dictId, dictData, onCancel, 
         <Form.Item label="值" name="dataValue" rules={[{ required: true, message: '请输入值' }]}>
           <Input placeholder="请输入值" />
         </Form.Item>
-        <Form.Item label="排序" name="sortValue">
+        <Form.Item label="排序" name="sortOrder">
           <InputNumber min={0} style={{ width: '100%' }} />
         </Form.Item>
         <Form.Item label="备注" name="remark">

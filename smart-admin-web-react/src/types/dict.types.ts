@@ -20,7 +20,7 @@ export interface DictDataVO {
   dictDisabledFlag: boolean;
   dataValue: string;
   dataLabel: string;
-  sortValue: number;
+  sortOrder: number;
   disabledFlag: boolean;
   remark: string;
 }
@@ -46,7 +46,7 @@ export interface DictDataAddForm {
   dictId: number;
   dataLabel: string;
   dataValue: string;
-  sortValue?: number;
+  sortOrder?: number;
   remark?: string;
 }
 

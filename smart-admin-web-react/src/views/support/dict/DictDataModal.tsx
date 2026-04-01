@@ -79,7 +79,7 @@ const DictDataModal: React.FC<Props> = ({ open, dictId, dictCode, onClose }) => 
   const columns: ColumnsType<DictDataVO> = [
     { title: '显示文本', dataIndex: 'dataLabel', width: 150 },
     { title: '值', dataIndex: 'dataValue', width: 120 },
-    { title: '排序', dataIndex: 'sortValue', width: 80 },
+    { title: '排序', dataIndex: 'sortOrder', width: 80 },
     { title: '备注', dataIndex: 'remark', ellipsis: true },
     {
       title: '状态',
