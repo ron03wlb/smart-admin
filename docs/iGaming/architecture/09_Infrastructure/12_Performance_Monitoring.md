@@ -1,6 +1,6 @@
 # 性能監控與告警架構（Performance Monitoring & Alerting）
 
-> **業務需求**: 不適用 — 純技術基礎設施文件
+> **業務需求**: [容量規劃需求 (Capacity Planning)](../../requirements/09_Infrastructure_Requirements/03_Capacity_Planning_Requirements.md) | [品質保證與測試驗收標準需求](../../requirements/09_Infrastructure_Requirements/01_QA_Standards_Requirements.md)
 > **規範來源**: [09-06 Performance Monitoring](../../source-archive/09_Technical_Infrastructure/09-06_Performance_Monitoring.md)
 > **目標讀者**: DevOps Engineers, SRE, Backend Engineers
 

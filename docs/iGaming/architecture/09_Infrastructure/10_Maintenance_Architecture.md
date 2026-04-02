@@ -1,6 +1,6 @@
 # 系統維護與優雅停機架構（Maintenance & Graceful Shutdown）
 
-> **業務需求**: 不適用 — 純技術基礎設施文件
+> **業務需求**: [品質保證與測試驗收標準需求 (QA Standards)](../../requirements/09_Infrastructure_Requirements/01_QA_Standards_Requirements.md)
 > **規範來源**: [09-05 Maintenance](../../source-archive/09_Technical_Infrastructure/09-05_Maintenance.md)
 > **目標讀者**: Technical Architects, DevOps Engineers, SRE
 

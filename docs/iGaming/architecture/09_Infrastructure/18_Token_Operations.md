@@ -4,7 +4,7 @@
      原始文件 20_Token_Validation_Service.md、21_Token_Cache_Performance.md、
      22_Token_Edge_Deployment.md 已於 Task [13] 合併至本文件。 -->
 
-> **業務需求**: 不適用 — 純技術基礎設施文件
+> **業務需求**: [品質保證與測試驗收標準需求 (QA Standards)](../../requirements/09_Infrastructure_Requirements/01_QA_Standards_Requirements.md)
 > **規範來源**: [09-13 Token Validation Service](../../source-archive/09_Technical_Infrastructure/09-13_Token_Validation_Service.md) | [09-13-02 Cache Performance](../../source-archive/09_Technical_Infrastructure/09-13-02_Cache_Performance.md) | [09-13-03 Edge Deployment](../../source-archive/09_Technical_Infrastructure/09-13-03_Edge_Deployment.md)
 > **目標讀者**: Security Architects, Backend Engineers, DevOps Engineers, Performance Engineers
 

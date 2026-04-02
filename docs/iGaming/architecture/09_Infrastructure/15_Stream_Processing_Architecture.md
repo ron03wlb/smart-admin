@@ -1,6 +1,6 @@
 # 串流處理架構（Stream Processing Architecture）
 
-> **業務需求**: 不適用 — 純技術基礎設施文件
+> **業務需求**: [容量規劃需求 (Capacity Planning)](../../requirements/09_Infrastructure_Requirements/03_Capacity_Planning_Requirements.md)
 > **規範來源**: [09-08 Stream Processing](../../source-archive/09_Technical_Infrastructure/09-08_Stream_Processing_Architecture.md)
 > **目標讀者**: Data Engineers, Backend Engineers, DevOps
 

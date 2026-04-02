@@ -1,6 +1,6 @@
 # API 通用模式（Common API Patterns）
 
-> **業務需求**: 不適用 — 純技術基礎設施文件
+> **業務需求**: [品質保證與測試驗收標準需求 (QA Standards)](../../requirements/09_Infrastructure_Requirements/01_QA_Standards_Requirements.md)
 > **規範來源**: [09-03-03 Common Patterns](../../source-archive/09_Technical_Infrastructure/09-03-03_Common_Patterns.md)
 > **視角**: Technical Architecture (Development & DevOps)
 

@@ -2,7 +2,7 @@
 
 > **Canonical Source**: [source-archive/00_Foundation/guides/00-09_Technology_Stack.md](../../source-archive/00_Foundation/guides/00-09_Technology_Stack.md)
 > **目標讀者（Audience）**: 架構師、後端開發人員、DevOps 工程師
-> **業務需求（Business Requirements）**: N/A（純技術文檔，無對應需求文件）
+> **業務需求（Business Requirements）**: [品質保證與測試驗收標準需求](../../requirements/09_Infrastructure_Requirements/01_QA_Standards_Requirements.md) | [容量規劃需求](../../requirements/09_Infrastructure_Requirements/03_Capacity_Planning_Requirements.md)
 > **最後同步（Last Synced）**: 2026-02-08
 
 ---

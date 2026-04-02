@@ -1,6 +1,6 @@
 # 性能優化規範（Performance Optimization）
 
-> **業務需求**: 不適用 — 純技術基礎設施文件
+> **業務需求**: [容量規劃需求 (Capacity Planning)](../../requirements/09_Infrastructure_Requirements/03_Capacity_Planning_Requirements.md) | [基礎設施成本優化需求](../../requirements/09_Infrastructure_Requirements/02_Cost_Optimization_Requirements.md)
 > **規範來源**: [09-07 Performance Optimization](../../source-archive/09_Technical_Infrastructure/09-07_Performance_Optimization.md)
 > **目標讀者**: Backend Engineers, Performance Engineers, DevOps
 

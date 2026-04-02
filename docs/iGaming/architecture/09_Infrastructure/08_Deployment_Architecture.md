@@ -1,6 +1,6 @@
 # 部署架構與 DevOps 規範（Deployment Architecture & DevOps Standards）
 
-> **業務需求**: 不適用 — 純技術基礎設施文件
+> **業務需求**: [基礎設施成本優化需求 (Cost Optimization)](../../requirements/09_Infrastructure_Requirements/02_Cost_Optimization_Requirements.md) | [容量規劃需求](../../requirements/09_Infrastructure_Requirements/03_Capacity_Planning_Requirements.md)
 > **規範來源**: [09-01 Deployment](../../source-archive/09_Technical_Infrastructure/09-01_Deployment.md)
 > **視角**: Technical Architecture (Development & DevOps)
 

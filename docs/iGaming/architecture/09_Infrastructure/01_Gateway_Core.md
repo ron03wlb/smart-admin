@@ -1,6 +1,6 @@
 # 網關核心架構 (Gateway Core Architecture)
 
-> **業務需求**: 不適用 — 純技術基礎設施文件
+> **業務需求**: [容量規劃需求 (Capacity Planning)](../../requirements/09_Infrastructure_Requirements/03_Capacity_Planning_Requirements.md)
 > **規範來源**: [09-02-01 Gateway Core](../../source-archive/09_Technical_Infrastructure/09-02-01_Gateway_Core.md)
 > **目標讀者**: Technical Architecture (Development & DevOps)
 
