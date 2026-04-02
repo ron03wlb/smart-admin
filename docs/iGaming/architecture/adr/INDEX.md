@@ -11,6 +11,8 @@
 | [ADR-013](ADR-013_Distributed_Wallet_Manager_Boundary.md) | 分佈式錢包交易的 Manager 層邊界 | ✅ 已採納 |
 | [ADR-014](ADR-014_TenantIgnore_Safety_Policy.md) | @TenantIgnore 安全使用策略 | ✅ 已採納 |
 | [ADR-015](ADR-015_Idempotency_Three_Layer_Defense.md) | 冪等策略三層防禦標準 | ✅ 已採納 |
+| [ADR-016](ADR-016_XREF_Header_Standard.md) | XREF Header 四種等效格式標準 | ✅ 已採納 |
+| [ADR-017](ADR-017_Implementation_Layer_Scope.md) | Implementation 層維持平層結構 | ✅ 已採納 |
 
 ## ADR 格式
 
