@@ -9,6 +9,45 @@
 
 ---
 
+## 觸發與執行流程概覽
+
+```mermaid
+sequenceDiagram
+    participant RE as Risk Engine
+    participant KB as Kafka Broker
+    participant RG as RG Module<br/>（負責任博彩）
+    participant PS as PlayerService
+    participant FS as FinanceService
+    participant NT as Notification
+
+    RE->>RE: 評估玩家活動<br/>（存款速度 / 淨損失 / AML 評分）
+
+    alt 脆弱性指標 MEDIUM
+        RE->>KB: 發布 risk.vulnerability.detected
+        KB->>RG: 消費事件
+        RG->>NT: 發送 RG 警告訊息
+    else 脆弱性指標 HIGH
+        RE->>KB: 發布 risk.affordability.trigger
+        KB->>RG: 消費事件
+        RG->>PS: 更新玩家保護狀態
+        RG->>NT: 啟動 Affordability 評估流程
+    else 風險評分 >= 70
+        RE->>KB: 發布 risk.account.suspended
+        KB->>RG: 消費事件
+        RG->>PS: 封鎖存款 / 提款 / 投注
+        RG->>FS: 套用存款上限
+        RG->>NT: 通知玩家帳號已暫停
+    else AML 違規確認
+        RE->>KB: 發布 risk.account.closed
+        KB->>RG: 消費事件
+        RG->>PS: 永久關閉帳戶
+        RG->>FS: 凍結全部待處理交易
+        RG->>NT: 通知 MLRO 合規人員
+    end
+```
+
+---
+
 ## 1. 概述（Overview）
 
 本文件定義 Risk Engine 如何決定**何時觸發**玩家保護行動。具體保護執行策略（API 端點規格、資料庫結構、Controller 實作）請參閱 [RG Player Protection API](../15_Responsible_Gambling/04_Player_Protection_API.md)。

@@ -9,6 +9,55 @@
 
 ---
 
+## 系統模組整合概覽
+
+```mermaid
+graph TD
+    PC[PlatformCore<br/>多租戶核心]
+    PS[PlayerService<br/>玩家管理]
+    FS[FinanceService<br/>金融服務]
+    GI[GameIntegration<br/>遊戲整合]
+    RE[RiskEngine<br/>風控引擎]
+    AE[ActivityEngine<br/>活動引擎]
+    RG[ResponsibleGambling<br/>負責任博彩]
+    AS[AnalyticsService<br/>分析服務]
+
+    PC -->|租戶隔離| PS
+    PC -->|租戶隔離| FS
+    PC -->|租戶隔離| GI
+    PC -->|租戶隔離| RE
+    PC -->|租戶隔離| AE
+
+    PS -->|驗證玩家狀態| FS
+    PS -->|VIP 等級| AE
+    RE -->|凍結/解凍玩家| PS
+    RE -->|觸發保護行動| RG
+
+    GI -->|無縫錢包 Debit/Credit| FS
+    GI -->|即時風控| RE
+
+    FS -->|申請風控審核| RE
+    FS -->|觸發紅利| AE
+    FS -->|存款完成事件| AS
+
+    AE -->|防濫用檢查| RE
+    AE -->|發放紅利| FS
+
+    RE -->|risk.player.blocked| PS
+    RE -->|攔截交易| FS
+    RE -->|暫停遊戲| GI
+    RE -->|取消紅利| AE
+
+    AS -->|記錄所有業務事件| AS
+
+    style PC fill:#f5f5f5,stroke:#999
+    style RE fill:#ffe0e0,stroke:#c00
+    style RG fill:#e0f0ff,stroke:#06c
+    style FS fill:#e8f5e9,stroke:#2a2
+```
+
+---
+
 ## 1. 模組依賴矩陣
 
 | 調用方 → 被調用方 | Player | Finance | Game | Activity | Risk | Platform |

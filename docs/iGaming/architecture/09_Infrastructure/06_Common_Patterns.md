@@ -6,6 +6,61 @@
 
 ---
 
+## 通用模式選擇決策樹
+
+```mermaid
+flowchart TD
+    START([開始：選擇 API 模式])
+
+    Q1{資料集大小？}
+    Q2{需要總頁數？}
+    Q3{操作是否耗時？}
+    Q4{資料是否頻繁變更？}
+    Q5{是否批量寫入？}
+
+    P_OFFSET[使用 Offset 分頁<br/>page + page_size<br/>適合：管理後台、報表]
+    P_CURSOR[使用 Cursor 分頁<br/>cursor + limit<br/>適合：交易記錄、無限滾動]
+    P_SYNC[同步處理<br/>直接返回結果<br/>HTTP 200 + data]
+    P_ASYNC[非同步處理<br/>返回任務 ID<br/>HTTP 202 + task_id]
+    P_CACHE[讀取快取<br/>Redis Cache<br/>Cache-Control: max-age]
+    P_DIRECT[直接查詢 DB<br/>Cache-Control: no-cache<br/>適合：餘額、交易狀態]
+    P_BATCH[批量操作<br/>POST /batch-create<br/>減少 HTTP 往返]
+    P_SINGLE[單筆操作<br/>標準 CRUD<br/>附冪等 Key]
+
+    START --> Q1
+    Q1 -->|小資料集<br/>< 10萬筆| Q2
+    Q1 -->|大資料集<br/>> 10萬筆| P_CURSOR
+
+    Q2 -->|需要| P_OFFSET
+    Q2 -->|不需要| P_CURSOR
+
+    P_OFFSET --> Q3
+    P_CURSOR --> Q3
+
+    Q3 -->|< 3 秒| P_SYNC
+    Q3 -->|> 3 秒 / 批量| P_ASYNC
+
+    P_SYNC --> Q4
+    P_ASYNC --> Q5
+
+    Q4 -->|低頻變更<br/>遊戲列表、VIP 等級| P_CACHE
+    Q4 -->|高頻變更<br/>餘額、即時狀態| P_DIRECT
+
+    Q5 -->|是| P_BATCH
+    Q5 -->|否| P_SINGLE
+
+    style P_OFFSET fill:#e8f5e9,stroke:#388e3c
+    style P_CURSOR fill:#e8f5e9,stroke:#388e3c
+    style P_SYNC fill:#e3f2fd,stroke:#1976d2
+    style P_ASYNC fill:#fff3e0,stroke:#f57c00
+    style P_CACHE fill:#fce4ec,stroke:#c62828
+    style P_DIRECT fill:#fce4ec,stroke:#c62828
+    style P_BATCH fill:#f3e5f5,stroke:#7b1fa2
+    style P_SINGLE fill:#f3e5f5,stroke:#7b1fa2
+```
+
+---
+
 ## 1. 統一錯誤碼體系（Unified Error Code System）
 
 ### 1.1 錯誤碼格式（Error Code Format）

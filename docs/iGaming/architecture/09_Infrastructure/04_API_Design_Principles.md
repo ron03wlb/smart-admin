@@ -6,6 +6,47 @@
 
 ---
 
+## API 分層架構總覽
+
+```mermaid
+flowchart TD
+    C[用戶端 / Client<br/>Web / Mobile / GP Integration]
+
+    subgraph GW[API Gateway 層]
+        direction TB
+        G1[速率限制 Rate Limiting<br/>Global / Tenant / User]
+        G2[身份驗證 Authentication<br/>JWT Bearer Token / Sa-Token]
+        G3[請求日誌 Audit Logging<br/>trace_id / X-Request-ID]
+        G1 --> G2 --> G3
+    end
+
+    subgraph SVC[Service 層]
+        direction LR
+        S1[玩家 API<br/>/api/v1/players]
+        S2[錢包 API<br/>/api/v1/wallets]
+        S3[遊戲 API<br/>/api/v1/games]
+        S4[風控 API<br/>/api/v1/risk]
+    end
+
+    subgraph DATA[Data 層]
+        direction LR
+        D1[(PostgreSQL<br/>主資料庫)]
+        D2[(Redis<br/>快取)]
+        D3[(Kafka<br/>訊息佇列)]
+    end
+
+    C -->|HTTPS + X-Tenant-ID<br/>Authorization: Bearer JWT| GW
+    GW -->|通過驗證 → 路由| SVC
+    GW -->|429 限流 / 401 未認證| C
+    SVC --> DATA
+
+    style GW fill:#fff3e0,stroke:#f57c00
+    style SVC fill:#e8f5e9,stroke:#388e3c
+    style DATA fill:#e3f2fd,stroke:#1976d2
+```
+
+---
+
 ## 1. RESTful 核心原則（RESTful Core Principles）
 
 ### 1.1 資源導向（Resource-Oriented）

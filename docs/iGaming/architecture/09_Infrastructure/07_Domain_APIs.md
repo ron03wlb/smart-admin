@@ -6,6 +6,67 @@
 
 ---
 
+## 領域 API 邊界與關係圖
+
+```mermaid
+flowchart TD
+    GW[API Gateway<br/>身份驗證 / 路由 / 限流]
+
+    subgraph PLAYER[玩家領域<br/>/api/v1/players]
+        PA[PlayerController<br/>註冊 / 查詢 / 更新狀態]
+        PK[KYC 驗證<br/>身份文件審核]
+        PV[VIP 等級<br/>積分管理]
+    end
+
+    subgraph FINANCE[金融領域<br/>/api/v1/wallets & /transactions]
+        WA[WalletController<br/>存款 / 提款 / 餘額查詢]
+        TX[TransactionController<br/>交易記錄 / 對帳]
+        CX[幣種兌換<br/>匯率服務]
+    end
+
+    subgraph GAME[遊戲領域<br/>/api/v1/games & /sessions]
+        GM[GameController<br/>遊戲列表 / 啟動]
+        GS[GameSessionController<br/>Session 管理 / 下注記錄]
+        GP[GP Integration<br/>Seamless Wallet API]
+    end
+
+    subgraph RISK[風控合規領域<br/>/api/v1/risk & /compliance]
+        RM[風險管理<br/>反洗錢 AML / 欺詐偵測]
+        SE[自我排除<br/>Self-Exclusion / 責任博彩]
+        LM[限額管理<br/>存款 / 損失 / 下注限額]
+    end
+
+    subgraph BONUS[活動紅利領域<br/>/api/v1/bonuses & /promotions]
+        BN[BonusController<br/>紅利發放 / 查詢]
+        VT[有效投注額<br/>Valid Turnover 計算]
+        PR[活動管理<br/>Promotion 週期控制]
+    end
+
+    GW --> PLAYER
+    GW --> FINANCE
+    GW --> GAME
+    GW --> RISK
+    GW --> BONUS
+
+    PA -->|玩家狀態驗證| WA
+    PA -->|KYC 狀態檢查| GM
+    GS -->|下注扣款| WA
+    GS -->|有效投注額更新| VT
+    WA -->|大額交易上報| RM
+    PA -->|自我排除限制| SE
+    SE -->|封鎖遊戲 Session| GS
+    BN -->|紅利入帳| WA
+    VT -->|達標觸發紅利| BN
+
+    style PLAYER fill:#e8f5e9,stroke:#388e3c
+    style FINANCE fill:#e3f2fd,stroke:#1976d2
+    style GAME fill:#fff3e0,stroke:#f57c00
+    style RISK fill:#fce4ec,stroke:#c62828
+    style BONUS fill:#f3e5f5,stroke:#7b1fa2
+```
+
+---
+
 ## 1. OpenAPI 3.0 規範
 
 ### 1.1 API 基本資訊

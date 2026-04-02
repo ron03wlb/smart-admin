@@ -6,6 +6,59 @@
 
 ---
 
+## Finance Service 文檔導覽
+
+```mermaid
+graph TD
+    IDX[無縫錢包架構索引<br/>01_Seamless_Wallet_Index]
+
+    subgraph 核心架構
+        SEC[安全性<br/>認證與 API 安全]
+        CON[併發控制<br/>樂觀鎖與分佈式鎖]
+        REC[恢復機制<br/>回滾與補償]
+        ACC[會計整合<br/>複式記帳 GL]
+        RCN[對帳<br/>餘額驗證]
+    end
+
+    subgraph 遊戲專屬整合
+        FS[免費旋轉<br/>Free Spins]
+        RH[輪盤對沖<br/>Roulette Hedge]
+        BT[百家樂和局<br/>Baccarat Tie]
+        SB[體育投注<br/>Sports Betting]
+    end
+
+    subgraph 對帳擴展
+        SS[體育結算對帳]
+        CO[提前兌現對帳]
+        BF[投注失敗對帳]
+        RC[回滾鏈對帳]
+        GP[GP 逾時框架]
+    end
+
+    IDX --> SEC
+    IDX --> CON
+    IDX --> REC
+    IDX --> ACC
+    IDX --> RCN
+
+    IDX --> FS
+    IDX --> RH
+    IDX --> BT
+    IDX --> SB
+
+    RCN --> SS
+    RCN --> CO
+    RCN --> BF
+    RCN --> RC
+    RCN --> GP
+
+    CON -->|樂觀鎖版本控制| REC
+    REC -->|補償事務 SAGA| RCN
+    ACC -->|GL 分錄驗證| RCN
+```
+
+---
+
 ## 技術架構文檔
 
 | 文檔 | 說明 | 來源 |

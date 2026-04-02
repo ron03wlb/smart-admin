@@ -7,6 +7,75 @@
 
 ---
 
+## 基礎設施部署架構圖
+
+```mermaid
+flowchart TD
+    subgraph INTERNET[外部流量]
+        USER[用戶端<br/>Web / Mobile]
+        GP_EXT[GP 遊戲供應商<br/>Seamless Wallet Callback]
+    end
+
+    subgraph EDGE[邊緣層]
+        CDN[CDN<br/>靜態資源 / DDoS 防護<br/>Cache-Control: immutable]
+    end
+
+    subgraph GW_LAYER[Gateway 層]
+        GW[Spring Cloud Gateway<br/>路由 / Auth Filter / Circuit Breaker]
+        RL[速率限制<br/>Redis Token Bucket<br/>Global / Tenant / User]
+    end
+
+    subgraph APP_LAYER[應用層 Kubernetes Pod]
+        APP1[SmartAdmin App<br/>Pod 1 v1.3.0]
+        APP2[SmartAdmin App<br/>Pod 2 v1.3.0]
+        APP3[SmartAdmin App<br/>Pod 3 v1.3.0]
+    end
+
+    subgraph DATA_LAYER[資料層]
+        PG_PRIMARY[(PostgreSQL Primary<br/>主節點 / 寫入)]
+        PG_REPLICA[(PostgreSQL Replica<br/>副本 / 只讀)]
+        REDIS[(Redis Cluster<br/>Session / 快取 / 限流)]
+        KAFKA[Kafka<br/>非同步事件<br/>交易 / 風控 / 審計]
+    end
+
+    subgraph OPS[運維層]
+        MONITOR[Prometheus + Grafana<br/>監控 / 告警]
+        LOG[ELK Stack<br/>集中日誌 / trace_id]
+    end
+
+    USER -->|HTTPS| CDN
+    CDN -->|動態請求| GW
+    GP_EXT -->|Webhook Callback| GW
+    GW <--> RL
+    GW -->|負載均衡 Round-Robin| APP1
+    GW -->|負載均衡 Round-Robin| APP2
+    GW -->|負載均衡 Round-Robin| APP3
+
+    APP1 -->|寫入| PG_PRIMARY
+    APP2 -->|讀取| PG_REPLICA
+    APP3 -->|讀取| PG_REPLICA
+    PG_PRIMARY -->|Streaming Replication| PG_REPLICA
+
+    APP1 <-->|快取 / Session| REDIS
+    APP2 <-->|快取 / Session| REDIS
+    APP3 <-->|快取 / Session| REDIS
+
+    APP1 -->|發布事件| KAFKA
+    APP2 -->|消費事件| KAFKA
+
+    APP1 -.->|Metrics / Logs| MONITOR
+    APP2 -.->|Metrics / Logs| LOG
+
+    style INTERNET fill:#f5f5f5,stroke:#9e9e9e
+    style EDGE fill:#fff8e1,stroke:#fbc02d
+    style GW_LAYER fill:#fff3e0,stroke:#f57c00
+    style APP_LAYER fill:#e8f5e9,stroke:#388e3c
+    style DATA_LAYER fill:#e3f2fd,stroke:#1976d2
+    style OPS fill:#fce4ec,stroke:#c62828
+```
+
+---
+
 ## 1. 概覽（Overview）
 
 本文檔涵蓋 iGaming 平台基礎設施的技術實作，包括 API Gateway 設計、Blue-Green 部署策略以及 API 速率限制。所有實作均遵循 SmartAdmin 架構模式，並以達成生產級可靠性為目標。
