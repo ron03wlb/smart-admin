@@ -37,15 +37,27 @@ SmartAdmin v4.1.0 iGaming 基礎建設實作設計文檔索引。
 |------|------|---------|
 | [03-risk-engine-design.md](03-risk-engine-design.md) | 1,639 | LiteFlow 五大風控組件、Kafka 事件消費、0-100 評分模型、風險提案工作流 (ADR-012)、服務抽取評估指標 |
 
+## Phase 4+：Sprint Reports & Gap Analysis（衝刺報告與缺口分析）
+
+| 文檔 | 狀態 | 核心內容 |
+|------|------|---------|
+| [00-infrastructure-gap-analysis.md](00-infrastructure-gap-analysis.md) | ✅ 20/20 gaps 完成 | 基礎設施缺口分析（D1-D11 決策、G1-G16 缺口修復） |
+| [sprint4-database-schema-design.md](sprint4-database-schema-design.md) | ✅ 已完成 | Sprint 4 資料庫 Schema 設計 |
+| [sprint4-service-layer-architecture.md](sprint4-service-layer-architecture.md) | ✅ 已完成 | Sprint 4 服務層架構設計 |
+| [g2.3-frontend-adaptation-spec.md](g2.3-frontend-adaptation-spec.md) | ✅ 已完成 | G2.3 前端 ISO-8601 + 多租戶 UI 適配 |
+| [database-boolean-migration.md](database-boolean-migration.md) | ✅ 已驗證 | PostgreSQL BOOLEAN 類型遷移方案 |
+| [V23-withdrawal-approval-evaluation.md](V23-withdrawal-approval-evaluation.md) | ✅ 已評估 | V23 提款審批流程評估 |
+| [v24-migration-verification-report.md](v24-migration-verification-report.md) | ✅ 已驗證 | V24 遷移腳本驗證報告 |
+| [phase2-week1-database-migration-complete.md](phase2-week1-database-migration-complete.md) | ✅ 已完成 | Phase 2 Week 1 資料庫遷移完成報告 |
+
 ---
 
 ## 統計摘要
 
 | 指標 | 數值 |
 |------|------|
-| 文檔總數 | 9 份 |
-| 總行數 | 11,082 行 |
-| 涵蓋 Phase | 0-3 |
+| 文檔總數 | 17 份 |
+| 涵蓋 Phase | 0-3 + Sprint 4 + Gap Analysis |
 | SmartAdmin 模式遵循 | Vavr Option、Manager-only @Transactional、Constructor Injection |
 | Mermaid 圖表 | flowchart、sequenceDiagram、stateDiagram-v2、gantt |
 | 語言標準 | 繁體中文 + 英文技術術語保留 |

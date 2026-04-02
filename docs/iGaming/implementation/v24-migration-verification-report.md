@@ -1,6 +1,8 @@
 # V24 遷移腳本驗證報告
 
 **驗證日期**: 2026-03-12
+
+> **XREF**: [Tenant Migration Procedures](../architecture/09_Infrastructure/26_Tenant_Migration_Procedures.md)
 **狀態**: ✅ 驗證通過
 **數據庫**: PostgreSQL 16（Docker 容器 sa21-postgres）
 **執行方式**: 手動執行 SQL 腳本（psql）

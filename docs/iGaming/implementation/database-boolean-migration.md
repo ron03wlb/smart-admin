@@ -4,6 +4,8 @@
 **狀態**: ✅ 已完成並驗證
 **決策**: 使用 PostgreSQL 原生 BOOLEAN 類型，不使用 MyBatis TypeHandler
 
+> **XREF**: [基礎設施實作](../architecture/09_Infrastructure/09_Infrastructure_Implementation.md) | [ADR-001 命名規範](../architecture/adr/ADR-001_Naming_Convention_Singular_Standard.md)
+
 ---
 
 ## 1. 問題背景

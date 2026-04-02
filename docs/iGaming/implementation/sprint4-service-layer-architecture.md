@@ -5,6 +5,8 @@
 **版本**: 1.0.0
 **設計者**: iGaming Team
 
+> **XREF**: [01 玩家服務架構](../architecture/01_Player_Service/) | [05 風控引擎架構](../architecture/05_Risk_Engine/) | [SmartAdmin 架構模式](../../../CLAUDE.md#architecture)
+
 ---
 
 ## 架構總覽
