@@ -2,6 +2,7 @@
 
 > **讀者對象（Audience）**: 架構師、後端開發人員、DevOps
 > **狀態（Status）**: 6 個架構文檔（含跨模組整合指南）
+> **業務需求**: [iGaming 需求文件索引](../../requirements/README.md)
 
 ---
 

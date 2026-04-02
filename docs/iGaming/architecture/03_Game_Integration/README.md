@@ -2,6 +2,7 @@
 
 > **Audience**: 架構師、後端開發人員、DevOps
 > **Status**: Phase 6 完成 - 4 份拆分文件 + 來源索引
+> **業務需求**: [遊戲整合需求](../../requirements/03_Gaming_Operations/02_Game_Integration_Requirements.md) | [有效投注額業務規則](../../requirements/03_Gaming_Operations/01_Turnover_Business_Rules.md)
 
 ---
 

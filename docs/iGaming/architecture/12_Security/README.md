@@ -2,6 +2,7 @@
 
 > **目標讀者**: 架構師、後端開發人員、安全工程師
 > **狀態**: 索引已建立 - 連結至 source/
+> **業務需求**: [安全合規需求](../../requirements/12_Security_Compliance/README.md)
 
 ---
 

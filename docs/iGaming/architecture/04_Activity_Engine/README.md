@@ -2,6 +2,7 @@
 
 > **目標讀者**: 架構師、後端開發、DevOps
 > **狀態**: Phase 6 完成 — 3 份拆分文檔 + 來源索引
+> **業務需求**: [促銷 VIP 需求](../../requirements/04_Promotions_VIP/README.md)
 
 ---
 

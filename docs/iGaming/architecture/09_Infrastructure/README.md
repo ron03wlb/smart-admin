@@ -2,6 +2,7 @@
 
 > **目標讀者**: Architects, Backend Developers, DevOps
 > **狀態**: 21 份架構文件
+> **業務需求**: [基礎設施需求](../../requirements/09_Infrastructure_Requirements/01_QA_Standards_Requirements.md) | [容量規劃需求](../../requirements/09_Infrastructure_Requirements/03_Capacity_Planning_Requirements.md)
 
 ---
 

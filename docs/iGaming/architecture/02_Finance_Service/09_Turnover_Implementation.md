@@ -9,6 +9,8 @@
 >
 > **架構 XREF**: [有效投注額架構：三層驗證與計算邏輯](./08_Turnover_Architecture.md)
 >
+> **業務需求**: [有效投注額業務規則](../../requirements/03_Gaming_Operations/01_Turnover_Business_Rules.md) | [財務調解需求](../../requirements/02_Financial_Operations/04_Reconciliation_Requirements.md)
+>
 > **目標讀者**: 架構師、後端開發人員、DevOps
 >
 > **最後更新**: 2026-03-31

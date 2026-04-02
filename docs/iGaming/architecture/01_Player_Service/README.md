@@ -2,6 +2,7 @@
 
 > **目標讀者（Audience）**: 架構師、後端開發人員、DevOps
 > **狀態（Status）**: Phase 4 完成 - 1 個拆分文檔
+> **業務需求**: [玩家體驗需求](../../requirements/01_Player_Experience/README.md) | [風控合規需求 (KYC/AML)](../../requirements/05_Risk_Compliance/README.md)
 
 ---
 

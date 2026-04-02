@@ -2,6 +2,7 @@
 
 > **目標讀者**: 架構師、後端開發、DevOps
 > **狀態**: Phase 6 完成 — 10 份拆分文檔 + 來源索引
+> **業務需求**: [風控合規需求](../../requirements/05_Risk_Compliance/README.md)
 
 ---
 
